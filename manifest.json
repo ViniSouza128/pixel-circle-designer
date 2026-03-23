@@ -2,7 +2,7 @@
   "id": "/pixel-circle-designer/",
   "name": "Pixel Circle Generator",
   "short_name": "Pixel Circle",
-  "start_url": "/pixel-circle-designer/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0b0b0f",
   "theme_color": "#0b0b0f",
