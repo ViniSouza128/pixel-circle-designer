@@ -343,7 +343,18 @@ function getPad(d){return Math.max(3,Math.ceil(d*.15));}
 
 function countArea(){return _paintedCount;}
 
-function setTrack(sl,v,max){sl.style.setProperty('--pct',(v/max*100)+'%');}
+function setTrack(sl, v, max){
+  const min = parseInt(sl.min) || 0;
+  const pct = (v - min) / (max - min);
+
+  const thumb = parseInt(getComputedStyle(sl).getPropertyValue('--thumb')) || 60;
+  const track = sl.offsetWidth - thumb;
+
+  const px = pct * track + thumb / 2;
+  const finalPct = (px / sl.offsetWidth) * 100;
+
+  sl.style.setProperty('--pct', finalPct + '%');
+}
 function getThumbPx(box){return parseInt(getComputedStyle(box).getPropertyValue('--thumb'))||60;}
 
 /* ── Mode word letter animation (item 1) ── */
@@ -570,7 +581,8 @@ function drawThumb(slEl,tcEl,boxEl,val,max,subLabel){
   const tc=tcEl.getContext('2d');
   tc.setTransform(dpr,0,0,dpr,0,0);tc.clearRect(0,0,r.width,r.height);
   const trackW=r.width-T;
-  const cx_t=T/2+(val/max)*trackW, cy_t=r.height/2;
+  const cx_t = T/2 + ((val - parseInt(slEl.min)) / (parseInt(slEl.max) - parseInt(slEl.min))) * trackW;
+  const cy_t = r.height / 2;
   const numStr=String(val);
   const maxW=T*0.76;
   let fsMain=Math.max(4,Math.floor(T*0.36));
