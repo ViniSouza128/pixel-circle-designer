@@ -3,7 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixel Circle Designer</title>
+<title>Pixel Circle Generator - Interactive Pixel Art Tool</title>
+<meta name="description" content="Interactive pixel circle generator for pixel art and grid-based design. Create perfect circles and ellipses with real-time visualization and multiple rendering methods.">
+
+<meta name="keywords" content="pixel,circle,generator,minecraft,pixel circle generator, pixel art circle, circle generator, ellipse, ellipse generator">
+
+<meta property="og:title" content="Pixel Circle Generator">
+<meta property="og:description" content="Create pixel-perfect circles and ellipses with real-time visualization.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vinisouza128.github.io/pixel-circle-designer/">
+<meta name="robots" content="index, follow">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@500;700&display=swap');
 
@@ -250,6 +259,9 @@
   max-width:100%;
 }
 </style>
+<link id="favicon" rel="icon" type="image/png" href="favicon_light.png">
+<link rel="icon" href="favicon_dark.png">
+<link rel="apple-touch-icon" href="favicon_light.png">
 </head>
 <body>
 
@@ -340,6 +352,16 @@
   <h1 id="h1-ls">Pixel <span class="mode-word" id="modeToggleLS"></span> Designer</h1>
 </div>
 <script>
+function updatePageTitle(){
+  document.title = isEllipse 
+    ? 'Pixel Ellipse Designer' 
+    : 'Pixel Circle Designer';
+}
+const faviconEl = document.getElementById('favicon');
+function updateFavicon(){
+  if(!faviconEl) return;
+  faviconEl.href = (isDark ? 'favicon_dark.png' : 'favicon_light.png') + '?v=' + Date.now();
+}
 /* Suppress ResizeObserver loop notification (benign browser quirk) */
 window.addEventListener('error', e=>{if(e.message&&e.message.includes('ResizeObserver'))e.stopImmediatePropagation();});
 
@@ -382,6 +404,8 @@ const THM={
   light:{bg:'#f2ede2',gridBg:'#ece8de',gridLine:'#bfb8a8',pixel:'#c82020',circleArc:'#7a1040',centerLine:'rgba(100,30,30,0.22)'},
 };
 let isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+btnTheme.classList.toggle('active', !isDark);
+updateFavicon();
 const C=()=>isDark?THM.dark:THM.light;
 
 let algo='euclidean',renderMode='filled';
@@ -435,6 +459,7 @@ function toggleEllipseMode(){
   isEllipse=!isEllipse;
   bodyEl.classList.toggle('ellipse',isEllipse);
   syncModeWords();
+    updatePageTitle(); // 🔥 aqui
   if(isEllipse){
     boxSize.style.display='none';boxWidth.style.display='';boxHeight.style.display='';
     setTrack(slWidth,diamW,32);setTrack(slHeight,diamH,32);
@@ -955,7 +980,17 @@ btnCircle.addEventListener('click',()=>{showCircle=!showCircle;btnCircle.classLi
 btnZoom.addEventListener('click',()=>{showZoom=!showZoom;btnZoom.classList.toggle('active',showZoom);draw();});
 btnCenter.addEventListener('click',()=>{showCenter=!showCenter;btnCenter.classList.toggle('active',showCenter);draw();});
 btnGrid.addEventListener('click',()=>{showGrid=!showGrid;btnGrid.classList.toggle('active',showGrid);draw();});
-btnTheme.addEventListener('click',()=>{isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');draw();});
+btnTheme.addEventListener('click',()=>{
+  isDark = !isDark;
+
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+  btnTheme.classList.toggle('active', !isDark);
+
+  updateFavicon(); // 🔥 aqui
+
+  draw();
+});
 btnDownload.addEventListener('click',downloadPNG);
 
 /* Debounce ResizeObserver to avoid loop notifications */
@@ -967,6 +1002,7 @@ new ResizeObserver(roDraw).observe(cWrap);
 window.addEventListener('resize',roDraw);
 setTrack(slSize,diamSize,32);setTrack(slWidth,diamW,32);setTrack(slHeight,diamH,32);
 syncModeWords();
+updatePageTitle();
 requestAnimationFrame(()=>requestAnimationFrame(draw));
 </script>
 </body>
