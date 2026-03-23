@@ -1,9 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pixel Circle Designer</title>
+
+<!-- SEO básico -->
+<title>Pixel Circle Generator - Interactive Pixel Art Tool</title>
+
+<meta name="description" content="Interactive pixel circle generator for pixel art and grid-based design. Create perfect circles and ellipses with real-time visualization.">
+
+<meta name="keywords" content="pixel circle generator, pixel art circle, circle generator grid, pixel shape tool, ellipse generator">
+
+<!-- Open Graph (preview quando manda link) -->
+<meta property="og:title" content="Pixel Circle Generator">
+<meta property="og:description" content="Create pixel-perfect circles and ellipses with real-time visualization.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vinisouza128.github.io/pixel-circle-designer/">
+
+<!-- Favicons (dark / light automático) -->
+<link rel="icon" href="favicon_dark.png" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="favicon_light.png" media="(prefers-color-scheme: light)">
+
+<!-- Fallback -->
+<link rel="icon" href="favicon_dark.png">
+
+<!-- iPhone / instalação -->
+<link rel="apple-touch-icon" href="favicon_light.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@500;700&display=swap');
 
@@ -26,11 +47,41 @@
   /* ═══════════ PORTRAIT ═══════════ */
   body{display:flex;flex-direction:column;align-items:center;padding:0 2dvw 2dvh;overflow:hidden;max-width:100dvw;}
 
-  #header-area{flex-shrink:0;height:11dvh;width:100%;display:flex;align-items:center;justify-content:center;}
-  #h1p{font-family:'Press Start 2P',monospace;font-size:3.5dvh;color:var(--text-hi);white-space:nowrap;line-height:1.2;}
-  .mode-word{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px;transition:color .15s;}
-  .mode-word:hover{color:var(--red-lt);}
-  html[data-theme="light"] .mode-word:hover{color:var(--red);}
+  #header-area{
+    flex-shrink:0;
+    /* item 2: no fixed height — just padding above/below the title */
+    padding:1.5dvh 0 1dvh;
+    width:100%;display:flex;align-items:center;justify-content:center;
+  }
+  #h1p{font-family:'Press Start 2P',monospace;font-size:3.5dvh;color:var(--muted);white-space:nowrap;line-height:1.2;}
+  /* item 2: landscape title same colour as portrait title */
+  body.ls #h1-ls{font-family:'Press Start 2P',monospace;font-size:3dvh;color:var(--muted);white-space:nowrap;line-height:1.2;}
+  /* item 1: mode-word — underline on the whole word (parent), letters animate individually */
+  .mode-word{
+    cursor:pointer;
+    display:inline-flex;
+    white-space:nowrap;
+    text-decoration:underline;
+    text-decoration-style:dotted;
+    text-underline-offset:4px;
+    /* text-decoration-skip-ink off so the dotted line is fully continuous */
+    text-decoration-skip-ink:none;
+  }
+  .mode-word:hover .mw-letter{color:var(--red-lt);}
+  html[data-theme="light"] .mode-word:hover .mw-letter{color:var(--red);}
+  .mw-letter{
+    display:inline-block;
+    color:inherit;
+    /* NO text-decoration on individual letters — handled by parent */
+    animation: mw-wave 5.5s ease-in-out infinite;
+    animation-delay: calc(var(--i,0) * 0.10s);
+  }
+  @keyframes mw-wave {
+    /* Long rest, brief gentle bounce */
+    0%,  62%, 100% { transform: translateY(0); }
+    68%            { transform: translateY(-18%); }
+    74%            { transform: translateY(0); }
+  }
   #h1-ls{display:none;}
 
   /* Canvas wrap: flex:1 fills remaining height; portrait always square via JS */
@@ -124,6 +175,9 @@
   html[data-theme="light"] #info-btn.active{background:var(--red-dim);border-color:var(--border-hi);color:var(--red);}
 
   #info-chip{display:none;flex-direction:column;justify-content:center;padding:0 11px;font-weight:700;color:var(--red-lt);letter-spacing:.04em;line-height:1.6;white-space:nowrap;cursor:pointer;height:calc(var(--btn)*2);overflow:hidden;}
+  /* item 4: area expression muted helper class */
+  .area-muted{color:var(--muted);}
+  #info-chip div{white-space:nowrap;}
   #info-chip.open{display:flex;}
   #info-chip:hover{border-color:var(--border-hi);}
   html[data-theme="light"] #info-chip{color:var(--red);}
@@ -140,7 +194,7 @@
   }
   body.ls #header-area{display:none!important;}
   body.ls #gap-render,body.ls #gap1,body.ls #gap2{display:none!important;}
-  body.ls #h1-ls{display:block;grid-area:title;align-self:center;justify-self:center;font-family:'Press Start 2P',monospace;font-size:3dvh;color:var(--text-hi);white-space:nowrap;line-height:1.2;}
+  body.ls #h1-ls{display:block;grid-area:title;align-self:center;justify-self:center;font-family:'Press Start 2P',monospace;font-size:3dvh;color:var(--muted);white-space:nowrap;line-height:1.2;}
   /* canvas-wrap fills its grid cell; frame fills wrap */
   body.ls #canvas-wrap{grid-area:canvas;overflow:hidden;min-width:0;min-height:0;display:flex;align-items:stretch;justify-content:stretch;flex:unset;width:unset;}
   /* Frame fills wrap completely; canvas is centered inside via JS ox/oy */
@@ -171,7 +225,7 @@
 <body>
 
 <div id="header-area">
-  <h1 id="h1p">Pixel <span class="mode-word" id="modeToggleP">Circle</span> Designer</h1>
+  <h1 id="h1p">Pixel <span class="mode-word" id="modeToggleP"></span> Designer</h1>
 </div>
 
 <div id="canvas-wrap">
@@ -251,7 +305,7 @@
     <span class="diam-label">Height</span>
   </div>
 </div>
-<h1 id="h1-ls">Pixel <span class="mode-word" id="modeToggleLS">Circle</span> Designer</h1>
+<h1 id="h1-ls">Pixel <span class="mode-word" id="modeToggleLS"></span> Designer</h1>
 
 <script>
 /* Suppress ResizeObserver loop notification (benign browser quirk) */
@@ -313,11 +367,31 @@ function countArea(){return _paintedCount;}
 function setTrack(sl,v,max){sl.style.setProperty('--pct',(v/max*100)+'%');}
 function getThumbPx(box){return parseInt(getComputedStyle(box).getPropertyValue('--thumb'))||60;}
 
+/* ── Mode word letter animation (item 1) ── */
+function buildModeWord(word){
+  return Array.from(word).map((ch,i)=>{
+    const s=document.createElement('span');
+    s.className='mw-letter';
+    s.textContent=ch;
+    s.style.setProperty('--i',String(i));
+    return s;
+  });
+}
+function syncModeWords(){
+  const word=isEllipse?'Ellipse':'Circle';
+  ['modeToggleP','modeToggleLS'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.innerHTML='';
+    buildModeWord(word).forEach(s=>el.appendChild(s));
+  });
+}
+
 /* ── Ellipse toggle ── */
 function toggleEllipseMode(){
   isEllipse=!isEllipse;
   bodyEl.classList.toggle('ellipse',isEllipse);
-  document.querySelectorAll('.mode-word').forEach(el=>{el.textContent=isEllipse?'Ellipse':'Circle';});
+  syncModeWords();
   if(isEllipse){
     boxSize.style.display='none';boxWidth.style.display='';boxHeight.style.display='';
     setTrack(slWidth,diamW,32);setTrack(slHeight,diamH,32);
@@ -333,13 +407,32 @@ document.getElementById('modeToggleLS').addEventListener('click',toggleEllipseMo
 /* ── Layout decision ── */
 function computeLayoutScores(){
   const W=window.innerWidth,H=window.innerHeight;
-  const ptPadH=H*.02,ptHdrH=H*.11,ptRowsH=52+52,ptGapsH=8*5,ptSlider=60+38;
-  const ptFreeH=H-ptPadH-ptHdrH-ptRowsH-ptGapsH-ptSlider;
+  // Portrait: header is now padding-based (~2.5dvh total), not fixed 11dvh
+  const ptHdrH=H*0.045;    // ~title line + padding
+  const ptPadB=H*0.02;
+  const ptRowsH=52+52,ptGapsH=8*5,ptSlider=60+38;
+  const ptFreeH=H-ptHdrH-ptPadB-ptRowsH-ptGapsH-ptSlider;
   const ptSide=Math.min(W*.96,ptFreeH);
   const sideCol=Math.min(82,Math.max(50,W*.07));
   const lsSideW=sideCol*2+W*.04+8*2;
   const lsFreeW=W-lsSideW,lsFreeH=H-H*.03-H*.04-8-45-38-8;
   return{pt:ptSide,ls:Math.min(lsFreeW,lsFreeH)};
+}
+
+/*
+  item 3: In landscape, check if canvas+sidecols overflows window width.
+  If the canvas pixel width (cW) would push total content beyond window,
+  reduce cW so it fits. This is done by capping availW in getAvailableSpace.
+  We detect overflow by comparing canvas+sidecol widths against innerWidth.
+*/
+function getLandscapeAvailW(){
+  // The grid has: sidecol + gap + canvasArea + gap + sidecol + padding*2
+  const W=window.innerWidth;
+  const sideCol=Math.min(82,Math.max(50,W*.07));
+  const pad=W*.04; // 2dvw each side
+  const gaps=8*2;  // gap between grid columns
+  const maxCanvasW=W - sideCol*2 - pad - gaps;
+  return Math.max(maxCanvasW,60);
 }
 function applyLayout(){
   const{pt,ls}=computeLayoutScores();
@@ -359,33 +452,20 @@ function applyLayout(){
   ═════════════════════════════════════════════════════════════════
 */
 function computeGeometry(availW,availH){
-  const pad=getPad;
+  // Portrait: canvas fills full body width AND available height (rectangular if needed)
+  // ps = min(cW/G, cH/G) keeps grid cells square; circle centred via ox/oy
   if(isEllipse){
     const padX=getPad(diamW),padY=getPad(diamH);
     const Gc=diamW+padX*2,Gr=diamH+padY*2;
-    if(isLS){
-      const cW=Math.max(availW,60),cH=Math.max(availH,40);
-      const ps=Math.min(cW/Gc,cH/Gr);
-      return{ps,Gc,Gr,ox:(cW-Gc*ps)/2,oy:(cH-Gr*ps)/2,cW,cH};
-    }else{
-      // Portrait: square canvas, ellipse centered
-      const side=Math.max(Math.min(availW,availH)-2,60);
-      const ps=Math.min(side/Gc,side/Gr);
-      const cW=side,cH=side;
-      return{ps,Gc,Gr,ox:(cW-Gc*ps)/2,oy:(cH-Gr*ps)/2,cW,cH};
-    }
+    const cW=Math.max(availW,60),cH=Math.max(availH,40);
+    const ps=Math.min(cW/Gc,cH/Gr);
+    return{ps,Gc,Gr,ox:(cW-Gc*ps)/2,oy:(cH-Gr*ps)/2,cW,cH};
   }else{
     const D=diamSize;if(!D)return null;
     const p=getPad(D),G=D+p*2;
-    if(isLS){
-      const cW=Math.max(availW,60),cH=Math.max(availH,40);
-      const ps=Math.min(cW/G,cH/G);
-      return{ps,Gc:G,Gr:G,ox:(cW-G*ps)/2,oy:(cH-G*ps)/2,cW,cH};
-    }else{
-      const side=Math.max(Math.min(availW,availH)-2,60);
-      const ps=side/G;
-      return{ps,Gc:G,Gr:G,ox:0,oy:0,cW:side,cH:side};
-    }
+    const cW=Math.max(availW,60),cH=Math.max(availH,40);
+    const ps=Math.min(cW/G,cH/G);
+    return{ps,Gc:G,Gr:G,ox:(cW-G*ps)/2,oy:(cH-G*ps)/2,cW,cH};
   }
 }
 
@@ -395,11 +475,19 @@ function getAvailableSpace(){
     mainCanvas.style.width='0';mainCanvas.style.height='0';
     cFrame.style.width='';cFrame.style.height='';
     const r=cWrap.getBoundingClientRect();
-    return{w:Math.floor(r.width),h:Math.floor(r.height)};
+    // item 3: cap width so canvas never pushes beyond window
+    const capW=getLandscapeAvailW();
+    return{w:Math.min(Math.floor(r.width),capW),h:Math.floor(r.height)};
   }else{
     cFrame.style.width='0px';cFrame.style.height='0px';
     const r=cWrap.getBoundingClientRect();
-    return{w:Math.floor(r.width)-4,h:Math.floor(r.height)-4};
+    // item 2: canvas width = full body width always; height = available vertical space
+    const bodyW=Math.floor(window.innerWidth*.96)-4;
+    // cW = bodyW; cH = min(bodyW, available height) to keep cells square but width fills controls
+    const availH=Math.max(Math.floor(r.height)-2,60);
+    // Canvas is square at min(bodyW, availH), but width is always bodyW
+    // Grid ps = min(bodyW,availH)/G — circle centred inside rectangular canvas via ox/oy
+    return{w:bodyW, h:availH};
   }
 }
 
@@ -412,14 +500,21 @@ function controlsWidth(){
 
 function syncWidths(cW){
   if(!isLS){
-    const ws=controlsWidth()+'px';
+    // item 3: controls always match the full body available width
+    // canvas width may be different (square) — controls stretch to fill body width
+    const bodyW=Math.floor(window.innerWidth*.96)-4;
+    const ws=bodyW+'px';
     renderRow.style.width=ws;algoRow.style.width=ws;boxesRow.style.width=ws;
+    // Also force canvas frame to match body width in portrait
+    // (getCanvasSize returns square based on available height/width)
+    // The canvas stays square; we just ensure controls align to body edges
   }else{renderRow.style.width='';algoRow.style.width='';boxesRow.style.width='';}
 }
 
 function fitTitle(cW){
   const el=isLS?h1Ls:h1p;
-  const maxH=Math.floor(window.innerHeight*.035);
+  // item 2: title size based on its actual rendered line height (3.5dvh cap)
+  const maxH=Math.min(Math.floor(window.innerHeight*.035), 40);
   const targetW=!isLS&&isEllipse?controlsWidth():cW;
   if(!targetW)return;
   el.style.fontSize=maxH+'px';
@@ -452,9 +547,18 @@ function updateInfo(cW){
   const chipW=Math.max(brEdge-8-chipLeft,60);
   infoChip.style.width=chipW+'px';
   const area=countArea();
+  /* item 5: if area >= 65, append (or N×64+R) with coloured numbers */
+  function areaLine(area){
+    if(area<65) return `Area: ${area}`;
+    const mult=Math.floor(area/64);
+    const rem=area%64;
+    const m='<span class="area-muted">';const me='</span>';
+    if(rem===0) return `Area: ${area} ${m}(or ${me}${mult}${m}\u00d764)${me}`;
+    return `Area: ${area} ${m}(or ${me}${mult}${m}\u00d764+${me}${rem}${m})${me}`;
+  }
   const lines=isEllipse
-    ?[`Width: ${diamW}`,`Height: ${diamH}`,`Area: ${area}`,`Algorithm: ${ALGO_FULL[algo]}`]
-    :[`Diameter: ${diamSize}`,`Radius: ${diamSize/2}`,`Area: ${area}`,`Algorithm: ${ALGO_FULL[algo]}`];
+    ?[`Width: ${diamW}`,`Height: ${diamH}`,areaLine(area),`Algorithm: ${ALGO_FULL[algo]}`]
+    :[`Diameter: ${diamSize}`,`Radius: ${diamSize/2}`,areaLine(area),`Algorithm: ${ALGO_FULL[algo]}`];
   const testEl=document.createElement('span');
   testEl.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font-family:"JetBrains Mono",monospace;font-weight:700;letter-spacing:0.04em;';
   document.body.appendChild(testEl);
@@ -477,7 +581,7 @@ function toggleInfo(){
 }
 infoBtnEl.addEventListener('click',toggleInfo);infoChip.addEventListener('click',toggleInfo);
 
-/* ── Thumb drawing: textBaseline='middle' for correct vertical centering ── */
+/* ── Thumb drawing ── */
 function drawThumb(slEl,tcEl,boxEl,val,max,subLabel){
   const wrap=slEl.parentElement;
   const r=wrap.getBoundingClientRect();if(!r.width)return;
@@ -486,16 +590,12 @@ function drawThumb(slEl,tcEl,boxEl,val,max,subLabel){
   tcEl.style.width=r.width+'px';tcEl.style.height=r.height+'px';
   const tc=tcEl.getContext('2d');
   tc.setTransform(dpr,0,0,dpr,0,0);tc.clearRect(0,0,r.width,r.height);
-
   const trackW=r.width-T;
-  const cx_t=T/2+(val/max)*trackW,cy_t=r.height/2;
+  const cx_t=T/2+(val/max)*trackW, cy_t=r.height/2;
   const numStr=String(val);
-  const maxW=T*0.78; // safe width inside circle
-
-  // Start with size proportional to thumb, then shrink until fits
-  let fsMain=Math.max(4,Math.floor(T*0.40));
-  let fsSub=Math.max(3,Math.floor(T*0.18));
-
+  const maxW=T*0.76;
+  let fsMain=Math.max(4,Math.floor(T*0.36));
+  let fsSub =Math.max(3,Math.floor(T*0.16));
   for(let iter=0;iter<12;iter++){
     tc.font=`700 ${fsMain}px sans-serif`;
     const sw=tc.measureText('⌀').width;
@@ -503,30 +603,27 @@ function drawThumb(slEl,tcEl,boxEl,val,max,subLabel){
     const nw=tc.measureText(numStr).width;
     if(sw+nw<=maxW)break;
     fsMain=Math.max(4,Math.floor(fsMain*0.85));
-    fsSub=Math.max(3,Math.floor(fsSub*0.85));
+    fsSub =Math.max(3,Math.floor(fsSub *0.85));
   }
-
   tc.font=`700 ${fsMain}px sans-serif`;const symW=tc.measureText('⌀').width;
   tc.font=`700 ${fsMain}px "JetBrains Mono",monospace`;const numW=tc.measureText(numStr).width;
-  const totalW=symW+numW;
-
-  /* Vertical centering using textBaseline='middle':
-     - Single line: draw at cy_t
-     - Two lines: shift up by (gap+fsSub)/2, sub at cy_t+(fsMain+gap)/2  */
-  const GAP=subLabel?Math.max(2,Math.floor(T*0.05)):0;
-  const totalH=fsMain+(subLabel?(GAP+fsSub):0);
-  const mainY=cy_t-totalH/2+fsMain/2;  // center of main line
-  const subY=subLabel?mainY+fsMain/2+GAP+fsSub/2:0;
-
+  const sx=cx_t-(symW+numW)/2;
+  /* textBaseline='middle' draws text with its visual midpoint at y.
+     Two-line: separate main and sub by (fsMain+fsSub)/2 + gap, both centred on cy_t */
   tc.textBaseline='middle';
-  const sx=cx_t-totalW/2;
   tc.fillStyle='#ffffff';
-  tc.font=`700 ${fsMain}px sans-serif`;tc.fillText('⌀',sx,mainY);
-  tc.font=`700 ${fsMain}px "JetBrains Mono",monospace`;tc.fillText(numStr,sx+symW,mainY);
-  if(subLabel){
-    tc.font=`700 ${fsSub}px "JetBrains Mono",monospace`;
+  if(!subLabel){
+    tc.font=`700 ${fsMain}px sans-serif`;tc.fillText('⌀',sx,cy_t);
+    tc.font=`700 ${fsMain}px "JetBrains Mono",monospace`;tc.fillText(numStr,sx+symW,cy_t);
+  }else{
+    const GAP=Math.max(2,Math.floor(T*0.04));
+    const halfSep=(fsMain+fsSub)/2+GAP;
+    const yMain=cy_t-halfSep/2;
+    const ySub =cy_t+halfSep/2;
+    tc.font=`700 ${fsMain}px sans-serif`;tc.fillText('⌀',sx,yMain);
+    tc.font=`700 ${fsMain}px "JetBrains Mono",monospace`;tc.fillText(numStr,sx+symW,yMain);
     tc.fillStyle='rgba(255,255,255,.65)';tc.textAlign='center';
-    tc.fillText(subLabel,cx_t,subY);
+    tc.font=`700 ${fsSub}px "JetBrains Mono",monospace`;tc.fillText(subLabel,cx_t,ySub);
   }
 }
 
@@ -747,6 +844,7 @@ function draw(){
   _paintedCount=0;for(let j=0;j<Gr;j++)for(let i=0;i<Gc;i++)if(f[j][i])_paintedCount++;
   updateInfo(cW);
   if(showZoom&&!isEllipse){
+    const m=1.0,pad=getPad(diamSize);
     const srcSpan=Math.max((cx+m)-(pad-m),(cy+m)-(pad-m));
     const zps=Math.min(cW,cH)/srcSpan;
     const zGeo={ps:zps,Gc,Gr,ox:-(pad-m)*zps,oy:-(pad-m)*zps};
@@ -814,6 +912,7 @@ new ResizeObserver(roDraw).observe(cWrap);
   .forEach(el=>{if(el)new ResizeObserver(()=>{if(_roDraw)cancelAnimationFrame(_roDraw);_roDraw=requestAnimationFrame(drawAllThumbs);}).observe(el);});
 window.addEventListener('resize',roDraw);
 setTrack(slSize,diamSize,32);setTrack(slWidth,diamW,32);setTrack(slHeight,diamH,32);
+syncModeWords();
 requestAnimationFrame(()=>requestAnimationFrame(draw));
 </script>
 </body>
