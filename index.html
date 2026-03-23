@@ -1007,6 +1007,9 @@ setTrack(slSize,diamSize,32);setTrack(slWidth,diamW,32);setTrack(slHeight,diamH,
 syncModeWords();
 updatePageTitle();
 requestAnimationFrame(()=>requestAnimationFrame(draw));
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
 </script>
 </body>
 </html>
