@@ -1008,7 +1008,9 @@ syncModeWords();
 updatePageTitle();
 requestAnimationFrame(()=>requestAnimationFrame(draw));
   if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/pixel-circle-designer/service-worker.js');
+  navigator.serviceWorker.register('./service-worker.js', {
+  scope: './'
+});
 }
 </script>
 </body>
