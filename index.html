@@ -17,8 +17,7 @@
 <meta property="og:url" content="https://vinisouza128.github.io/pixel-circle-designer/">
 
 <!-- Favicons (dark / light automático) -->
-<link rel="icon" href="favicon_dark.png" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="favicon_light.png" media="(prefers-color-scheme: light)">
+<link rel="icon" id="favicon" href="favicon_dark.png">
 
 <!-- Fallback -->
 <link rel="icon" href="favicon_dark.png">
@@ -901,7 +900,17 @@ btnCircle.addEventListener('click',()=>{showCircle=!showCircle;btnCircle.classLi
 btnZoom.addEventListener('click',()=>{showZoom=!showZoom;btnZoom.classList.toggle('active',showZoom);draw();});
 btnCenter.addEventListener('click',()=>{showCenter=!showCenter;btnCenter.classList.toggle('active',showCenter);draw();});
 btnGrid.addEventListener('click',()=>{showGrid=!showGrid;btnGrid.classList.toggle('active',showGrid);draw();});
-btnTheme.addEventListener('click',()=>{isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');draw();});
+btnTheme.addEventListener('click',()=>{
+  isDark=!isDark;
+
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+
+  // troca favicon junto com o tema
+  const favicon = document.getElementById('favicon');
+  favicon.href = isDark ? 'favicon_dark.png' : 'favicon_light.png';
+
+  draw();
+});
 btnDownload.addEventListener('click',downloadPNG);
 
 /* Debounce ResizeObserver to avoid loop notifications */
