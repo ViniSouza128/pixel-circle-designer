@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Circle Designer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  :root {
+    --bg:        #0b0b0f;
+    --surface:   rgba(255,255,255,0.04);
+    --border:    rgba(224,48,48,0.32);
+    --border-hi: rgba(224,48,48,0.72);
+    --red:       #e03030;
+    --red-lt:    #ff8080;
+    --red-dim:   rgba(224,48,48,0.16);
+    --gl:        #1e1e2c;
+    --muted:     #4a4666;
+    --text:      #d4d0ef;
+    --text-hi:   #ffffff;
+    --radius:    12px;
+    --thumb:     80px;
+    --btn:       44px;
+  }
+  html[data-theme="light"] {
+    --bg:#f2ede2; --surface:rgba(0,0,0,0.04); --border:rgba(170,30,30,0.30);
+    --border-hi:rgba(170,30,30,0.68); --red:#cc2020; --red-lt:#dd4444;
+    --red-dim:rgba(200,32,32,0.12); --gl:#bfb8a8; --muted:#8a7060;
+    --text:#2a1f1a; --text-hi:#0a0506;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;transition:background .25s,color .25s;}
+
+  /* ═══════════════════════════════════════════════
+     PORTRAIT  — body is a column
+     Order: 1=header, 2=canvas, 3=render-row,
+            4=algo-row, 5=diam-box
+  ═══════════════════════════════════════════════ */
+  body {
+    display:flex; flex-direction:column; align-items:center;
+    padding:0 3dvw 6.5dvh; gap:0;
+  }
+
+  /* ── CSS order for portrait ── */
+  #header-area { order:1; }
+  #canvas-wrap { order:2; }
+  #gap-render  { order:3; }
+  #render-row  { order:3; }
+  #gap1        { order:4; }
+  #algo-row    { order:4; }
+  #gap2        { order:5; }
+  #diam-box    { order:5; }
+
+  /* ── Header (portrait) ── */
+  #header-area {
+    flex-shrink:0; height:13dvh; width:100%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  h1 {
+    font-family:'Press Start 2P',monospace;
+    font-size:1rem; /* JS sets this */
+    color:var(--text-hi); white-space:nowrap; line-height:1.2;
+  }
+  /* Landscape h1 — hidden in portrait */
+  #h1-ls { display:none; }
+
+  /* ── Canvas wrap ── */
+  #canvas-wrap {
+    flex:1 1 0; min-height:0; width:100%;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  #canvas-container {
+    position:relative; flex-shrink:0;
+    border-radius:var(--radius); overflow:hidden;
+  }
+  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
+
+  /* ── Overlay ── */
+  #diam-overlay {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; transition:opacity .12s; gap:0;
+    text-shadow:0 0 40px rgba(0,0,0,0.95),0 0 8px rgba(0,0,0,0.95);
+  }
+  #diam-overlay.visible{opacity:1;}
+  #ov-diam{
+    font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:clamp(3rem,10vw,7rem);
+    color:rgba(255,255,255,0.95); letter-spacing:-0.01em; line-height:1;
+    display:flex; align-items:baseline;
+  }
+  #ov-diam .sym{font-family:sans-serif;font-size:1.25em;font-weight:700;}
+  #ov-rad{
+    font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:clamp(0.9rem,2.5vw,2rem);
+    color:rgba(255,255,255,0.58); letter-spacing:0.02em; line-height:1; margin-top:1px;
+  }
+
+  /* ── Shared surface ── */
+  .surface{background:rgba(11,11,15,0.88);border:1px solid var(--border);border-radius:var(--radius);transition:border-color .15s,background .15s;}
+  html[data-theme="light"] .surface{background:rgba(242,237,226,0.88);}
+
+  /* ── Canvas buttons ── */
+  #canvas-btns-top{position:absolute;top:10px;right:10px;display:flex;gap:7px;}
+  #canvas-btns-bot{position:absolute;bottom:10px;right:10px;display:flex;gap:7px;}
+  #canvas-info{position:absolute;bottom:10px;left:10px;}
+  .c-btn{width:var(--btn);height:var(--btn);cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;flex-shrink:0;color:var(--red-lt);}
+  .c-btn:hover{border-color:var(--border-hi);background:rgba(224,48,48,.12);color:var(--text-hi);}
+  .c-btn.active{background:rgba(224,48,48,.28);border-color:var(--border-hi);color:var(--text-hi);}
+  #info-btn{width:var(--btn);height:var(--btn);font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;color:var(--red-lt);}
+  #info-btn:hover{border-color:var(--border-hi);color:var(--text-hi);}
+  #info-btn.active{background:rgba(224,48,48,.24);border-color:var(--border-hi);color:var(--text-hi);}
+  #info-chip{display:none;padding:10px 16px;font-size:clamp(0.72rem,1.5vw,.9rem);font-weight:700;color:var(--red-lt);letter-spacing:.05em;line-height:2;white-space:nowrap;cursor:pointer;}
+  #info-chip:hover{border-color:var(--border-hi);}
+
+  /* ── Portrait gaps ── */
+  #gap-render{height:12px;flex-shrink:0;}
+  #gap1{height:10px;flex-shrink:0;}
+  #gap2{height:12px;flex-shrink:0;}
+
+  /* ── Pill button rows — portrait: horizontal ── */
+  #render-row,#algo-row{
+    flex-shrink:0; display:flex; justify-content:center; gap:10px; align-items:stretch;
+  }
+  .rnd-opt,.algo-opt{
+    flex:1 1 0; display:flex; flex-direction:column; align-items:center; gap:7px;
+    cursor:pointer; padding:10px 14px; border-radius:var(--radius);
+    border:1px solid var(--border); background:var(--surface);
+    transition:border-color .15s,background .15s; user-select:none;
+  }
+  .rnd-opt:hover,.algo-opt:hover{border-color:var(--border-hi);background:rgba(224,48,48,.08);}
+  .rnd-opt.active,.algo-opt.active{border-color:var(--border-hi);background:var(--red-dim);}
+  .rnd-icon{font-size:clamp(.85rem,1.6vw,1.1rem);line-height:1;color:var(--muted);transition:color .15s;}
+  .rnd-opt.active .rnd-icon{color:var(--red-lt);}
+  .rnd-name,.algo-name{font-size:clamp(.68rem,1.35vw,.9rem);font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transition:color .15s;}
+  .rnd-opt.active .rnd-name,.algo-opt.active .algo-name{color:var(--red-lt);}
+  .algo-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;transition:background .15s,border-color .15s;}
+  .algo-opt.active .algo-dot{background:var(--red);border-color:var(--red-lt);}
+
+  /* ── Size box ── */
+  #diam-box{
+    flex-shrink:0; display:flex; flex-direction:column; align-items:center;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:0 16px 8px; transition:border-color .15s;
+  }
+  #diam-slider-wrap{width:100%;position:relative;padding:calc(var(--thumb)/2) 0;}
+  input#diamSl{
+    -webkit-appearance:none;appearance:none;
+    width:100%;height:16px;border-radius:8px;outline:none;cursor:pointer;display:block;
+    background:linear-gradient(to right,var(--red) 0%,var(--red) var(--pct,0%),var(--gl) var(--pct,0%),var(--gl) 100%);
+  }
+  input#diamSl::-webkit-slider-thumb{-webkit-appearance:none;width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2.5px solid var(--red-lt);box-shadow:none;cursor:pointer;}
+  input#diamSl::-moz-range-thumb{width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2.5px solid var(--red-lt);box-shadow:none;cursor:pointer;}
+  #thumb-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
+  #diam-label{font-size:clamp(1.2rem,2.7vw,1.7rem);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+
+  /* ═══════════════════════════════════════════════
+     LANDSCAPE  — body becomes a row
+     [render-col] [center-col] [algo-col]
+  ═══════════════════════════════════════════════ */
+  @media (orientation:landscape) {
+    body {
+      flex-direction:row;
+      align-items:stretch;
+      padding:2dvh 2dvw;
+      gap:10px;
+    }
+
+    /* Kill portrait-only elements */
+    #header-area,#gap-render,#gap1,#gap2 { display:none !important; }
+
+    /* Reset portrait order */
+    #canvas-wrap,#render-row,#algo-row,#diam-box { order:0; }
+
+    /* ── Left col: render pills, stacked vertically ── */
+    #render-row {
+      flex-direction:column;
+      flex:0 0 auto;
+      width:clamp(52px,7dvw,76px);
+      height:100%;
+      gap:8px;
+      align-items:stretch;
+      justify-content:center;
+    }
+    .rnd-opt {
+      flex:1 1 0;
+      flex-direction:column;
+      padding:10px 6px 14px;
+      gap:8px;
+      justify-content:space-between;
+      min-height:0;
+    }
+    .rnd-icon { font-size:clamp(0.8rem,1.4dvh,1.1rem); }
+    .rnd-name {
+      writing-mode:vertical-lr;
+      transform:rotate(180deg);
+      font-size:clamp(0.52rem,1.1dvh,0.75rem);
+      white-space:nowrap;
+    }
+
+    /* ── Center col: title + canvas + slider ── */
+    #center-col {
+      flex:1 1 0;
+      min-width:0;
+      display:flex !important;   /* override display:contents from portrait */
+      flex-direction:column;
+      align-items:center;
+      gap:8px;
+    }
+    #h1-ls {
+      display:block !important;
+      flex-shrink:0;
+      font-family:'Press Start 2P',monospace;
+      font-size:1rem;  /* JS sets this */
+      color:var(--text-hi);
+      white-space:nowrap;
+      line-height:1.2;
+    }
+    #canvas-wrap {
+      flex:1 1 0;
+      min-height:0;
+      width:100%;
+    }
+    #diam-box {
+      width:100%;
+      flex-shrink:0;
+      padding:0 16px 8px;
+    }
+
+    /* ── Right col: algo pills, stacked vertically ── */
+    #algo-row {
+      flex-direction:column;
+      flex:0 0 auto;
+      width:clamp(52px,7dvw,76px);
+      height:100%;
+      gap:8px;
+      align-items:stretch;
+      justify-content:center;
+    }
+    .algo-opt {
+      flex:1 1 0;
+      flex-direction:column;
+      padding:10px 6px 14px;
+      gap:8px;
+      justify-content:space-between;
+      min-height:0;
+    }
+    .algo-dot { width:11px; height:11px; }
+    .algo-name {
+      writing-mode:vertical-lr;
+      transform:rotate(180deg);
+      font-size:clamp(0.52rem,1.1dvh,0.75rem);
+      white-space:nowrap;
+    }
+  }
+
+  /* Portrait: center-col is transparent (children participate in body flex) */
+  #center-col { display:contents; }
+</style>
+</head>
+<body>
+
+<!-- Portrait header (order:1 in portrait, hidden in landscape) -->
+<div id="header-area"><h1 id="h1-portrait">Pixel Circle Designer</h1></div>
+
+<!-- LEFT in landscape / ORDER:3 in portrait -->
+<div id="render-row">
+  <label class="rnd-opt active" data-mode="filled">
+    <span class="rnd-icon">●</span><span class="rnd-name">Filled</span>
+    <input type="radio" name="rmode" value="filled" checked hidden>
+  </label>
+  <label class="rnd-opt" data-mode="thin">
+    <span class="rnd-icon">○</span><span class="rnd-name">Thin</span>
+    <input type="radio" name="rmode" value="thin" hidden>
+  </label>
+  <label class="rnd-opt" data-mode="thick">
+    <span class="rnd-icon">◎</span><span class="rnd-name">Thick</span>
+    <input type="radio" name="rmode" value="thick" hidden>
+  </label>
+</div>
+
+<!-- CENTER col (transparent in portrait via display:contents) -->
+<div id="center-col">
+  <span id="h1-ls">Pixel Circle Designer</span>
+
+  <!-- order:2 in portrait -->
+  <div id="canvas-wrap">
+    <div id="canvas-container">
+      <canvas id="c"></canvas>
+      <div id="diam-overlay">
+        <span id="ov-diam"><span class="sym"></span><span id="ov-num"></span></span>
+        <span id="ov-rad"></span>
+      </div>
+      <div id="canvas-info">
+        <button id="info-btn" class="surface" title="Info">i</button>
+        <div id="info-chip" class="surface"></div>
+      </div>
+      <div id="canvas-btns-top">
+        <button class="c-btn surface" id="btnDownload" title="Download 4000×4000 PNG">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="7,10 12,15 17,10"/><line x1="4" y1="20" x2="20" y2="20"/></svg>
+        </button>
+        <button class="c-btn surface" id="btnTheme" title="Toggle light/dark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.9" y2="7.1"/><line x1="4.9" y1="19.1" x2="7.1" y2="16.9"/></svg>
+        </button>
+      </div>
+      <div id="canvas-btns-bot">
+        <button class="c-btn surface" id="btnCenter" title="Toggle center guides">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="2" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/></svg>
+        </button>
+        <button class="c-btn surface" id="btnCircle" title="Perfect circle overlay">
+          <svg width="20" height="20" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="13" cy="13" r="9"/></svg>
+        </button>
+        <button class="c-btn surface" id="btnZoom" title="Zoom top-left">
+          <svg width="20" height="20" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7.5"/><line x1="17" y1="17" x2="23.5" y2="23.5"/><line x1="8.5" y1="11" x2="13.5" y2="11"/><line x1="11" y1="8.5" x2="11" y2="13.5"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- order:5 in portrait (via gap2 sibling) -->
+  <div id="diam-box">
+    <div id="diam-slider-wrap">
+      <input type="range" id="diamSl" min="0" max="64" step="1" value="32">
+      <canvas id="thumb-canvas"></canvas>
+    </div>
+    <span id="diam-label">Size</span>
+  </div>
+</div><!-- /center-col -->
+
+<!-- RIGHT in landscape / ORDER:4 in portrait -->
+<div id="algo-row">
+  <label class="algo-opt active" data-algo="euclidean">
+    <span class="algo-dot"></span><span class="algo-name">Euclidean</span>
+    <input type="radio" name="algo" value="euclidean" checked hidden>
+  </label>
+  <label class="algo-opt" data-algo="bresenham">
+    <span class="algo-dot"></span><span class="algo-name">Bresenham</span>
+    <input type="radio" name="algo" value="bresenham" hidden>
+  </label>
+  <label class="algo-opt" data-algo="threshold">
+    <span class="algo-dot"></span><span class="algo-name">Threshold</span>
+    <input type="radio" name="algo" value="threshold" hidden>
+  </label>
+</div>
+
+<!-- Portrait-only spacer gaps (hidden in landscape) -->
+<div id="gap-render" style="height:12px;flex-shrink:0;"></div>
+<div id="gap1"       style="height:10px;flex-shrink:0;"></div>
+<div id="gap2"       style="height:12px;flex-shrink:0;"></div>
+
+<script>
+/* ── DOM ─────────────────────────────────────── */
+const mainCanvas  = document.getElementById('c');
+const ctx         = mainCanvas.getContext('2d');
+const cCont       = document.getElementById('canvas-container');
+const cWrap       = document.getElementById('canvas-wrap');
+const renderRow   = document.getElementById('render-row');
+const algoRow     = document.getElementById('algo-row');
+const centerCol   = document.getElementById('center-col');
+const diamBox     = document.getElementById('diam-box');
+const diamSl      = document.getElementById('diamSl');
+const thumbCv     = document.getElementById('thumb-canvas');
+const thumbCtx    = thumbCv.getContext('2d');
+const infoBtnEl   = document.getElementById('info-btn');
+const infoChip    = document.getElementById('info-chip');
+const diamOverlay = document.getElementById('diam-overlay');
+const ovNum       = document.getElementById('ov-num');
+const ovSym       = diamOverlay.querySelector('.sym');
+const ovRad       = document.getElementById('ov-rad');
+const h1Portrait  = document.getElementById('h1-portrait');
+const h1Ls        = document.getElementById('h1-ls');
+const btnCircle   = document.getElementById('btnCircle');
+const btnZoom     = document.getElementById('btnZoom');
+const btnTheme    = document.getElementById('btnTheme');
+const btnDownload = document.getElementById('btnDownload');
+const btnCenter   = document.getElementById('btnCenter');
+
+const ALGO_FULL = {
+  euclidean:'Euclidean Distance',
+  bresenham:'Midpoint Circle (Bresenham)',
+  threshold:'Threshold Coverage',
+};
+const THM = {
+  dark: {bg:'#0b0b0f',gridBg:'#13131c',gridLine:'#1e1e2c',pixel:'#e03030',circleArc:'#ffffff',centerEven:'rgba(80,80,102,0.22)',centerOdd:'rgba(80,80,102,0.10)'},
+  light:{bg:'#f2ede2',gridBg:'#ece8de',gridLine:'#bfb8a8',pixel:'#c82020',circleArc:'#1a0808',centerEven:'rgba(60,20,10,0.55)',  centerOdd:'rgba(60,20,10,0.20)'},
+};
+let isDark=true;
+const C=()=>isDark?THM.dark:THM.light;
+
+let diameter=32,radius=16,algo='euclidean',renderMode='filled';
+let showCircle=false,showZoom=false,showCenter=false;
+let sliderActive=false,infoExpanded=false;
+const THUMB=80;
+
+function isLandscape(){return window.innerWidth>window.innerHeight;}
+
+const areaTable=Array.from({length:65},(_,D)=>{
+  if(!D)return 0;const r=D/2,cx=D/2,cy=D/2;let a=0;
+  for(let j=0;j<D;j++)for(let i=0;i<D;i++)if(Math.sqrt((i+.5-cx)**2+(j+.5-cy)**2)<=r)a++;
+  return a;
+});
+
+function setTrack(v){diamSl.style.setProperty('--pct',(v/64*100)+'%');}
+function getSize(){const{width:w,height:h}=cWrap.getBoundingClientRect();return Math.max(Math.min(w,h)-2,60);}
+
+/* ── Dynamic title fit ── */
+function fitTitle(){
+  // Which h1 is active?
+  const h1=isLandscape()?h1Ls:h1Portrait;
+  // Width to fill = canvas width (same as diam-box)
+  const refW=diamBox.getBoundingClientRect().width||200;
+  if(!refW)return;
+  let lo=6,hi=300;
+  for(let i=0;i<20;i++){
+    const mid=(lo+hi)/2;
+    h1.style.fontSize=mid+'px';
+    if(h1.scrollWidth<=refW)lo=mid;else hi=mid;
+  }
+  h1.style.fontSize=lo+'px';
+}
+
+/* ── Thumb canvas ── */
+function drawThumb(){
+  const wrap=document.getElementById('diam-slider-wrap');
+  const r=wrap.getBoundingClientRect();
+  if(!r.width)return;
+  const T=THUMB;
+  const dpr=window.devicePixelRatio||1;
+  thumbCv.width=Math.round(r.width*dpr);thumbCv.height=Math.round(r.height*dpr);
+  thumbCv.style.width=r.width+'px';thumbCv.style.height=r.height+'px';
+  thumbCtx.setTransform(dpr,0,0,dpr,0,0);thumbCtx.clearRect(0,0,r.width,r.height);
+  const trackW=r.width-T;
+  const cx_t=T/2+(diameter/64)*trackW,cy_t=r.height/2;
+  const fsSym=Math.round(T*0.47),fsNum=Math.round(T*0.42),fsRad=Math.round(T*0.19);
+  const numStr=String(diameter);
+  thumbCtx.textBaseline='alphabetic';
+  thumbCtx.font=`700 ${fsSym}px sans-serif`;
+  const symW=thumbCtx.measureText('⌀').width;
+  thumbCtx.font=`700 ${fsNum}px "JetBrains Mono",monospace`;
+  const numW=thumbCtx.measureText(numStr).width;
+  const gap=1,sx=cx_t-(symW+gap+numW)/2;
+  const capH1=fsSym*0.72,capH2=fsRad*0.72;
+  const y1=cy_t-(capH1+4+capH2)/2+capH1;
+  thumbCtx.fillStyle='#ffffff';
+  thumbCtx.font=`700 ${fsSym}px sans-serif`;
+  thumbCtx.fillText('⌀',sx,y1);
+  thumbCtx.font=`700 ${fsNum}px "JetBrains Mono",monospace`;
+  thumbCtx.fillText(numStr,sx+symW+gap,y1);
+  thumbCtx.font=`700 ${fsRad}px "JetBrains Mono",monospace`;
+  thumbCtx.fillStyle='rgba(255,255,255,0.65)';
+  thumbCtx.textAlign='center';thumbCtx.textBaseline='middle';
+  thumbCtx.fillText(`r${radius}`,cx_t,y1+4+fsRad*0.5);
+}
+
+/* ── Overlay ── */
+function syncOverlay(visible){
+  ovSym.textContent=visible?'⌀':'';ovNum.textContent=visible?String(diameter):'';ovRad.textContent=visible?`r${radius}`:'';
+  diamOverlay.classList.toggle('visible',visible);
+}
+
+/* ── Info ── */
+function updateInfo(){infoChip.innerHTML=`Diameter  ${diameter}<br>Radius  ${radius}<br>Area  ${areaTable[diameter]??0}<br>Algorithm  ${ALGO_FULL[algo]}`;}
+function toggleInfo(){infoExpanded=!infoExpanded;infoBtnEl.style.display=infoExpanded?'none':'flex';infoChip.style.display=infoExpanded?'block':'none';}
+infoBtnEl.addEventListener('click',toggleInfo);infoChip.addEventListener('click',toggleInfo);
+
+/* ══ ALGORITHMS ══════════════════════════════ */
+function fillEuclidean(G,cx,cy,R,f){const R2=R*R;for(let j=0;j<G;j++){const dy=j+.5-cy,dy2=dy*dy;if(dy2>R2)continue;const dx=Math.sqrt(R2-dy2);const lo=Math.max(0,Math.ceil(cx-dx-.5)),hi=Math.min(G-1,Math.floor(cx+dx-.5));for(let i=lo;i<=hi;i++)f[j][i]=1;}}
+function fillBresenham(G,cx,cy,R,f){const iR=Math.floor(R),isEven=(cx===Math.floor(cx));if(iR===0){if(!isEven){const pi=Math.floor(cx),pj=Math.floor(cy);if(pi>=0&&pi<G&&pj>=0&&pj<G)f[pj][pi]=1;}return;}const rMin=new Int32Array(G).fill(G),rMax=new Int32Array(G).fill(-1);function span(row,lo,hi){if(row<0||row>=G||lo>hi)return;const l=Math.max(0,lo),r=Math.min(G-1,hi);if(l>r)return;if(l<rMin[row])rMin[row]=l;if(r>rMax[row])rMax[row]=r;}let x=0,y=iR,d=1-iR;while(x<=y){if(isEven){span(cy-y,cx-x,cx+x-1);span(cy+y-1,cx-x,cx+x-1);span(cy-x-1,cx-y,cx+y-1);span(cy+x,cx-y,cx+y-1);}else{const gcx=Math.floor(cx),gcy=Math.floor(cy);span(gcy+y,gcx-x,gcx+x);span(gcy-y,gcx-x,gcx+x);span(gcy+x,gcx-y,gcx+y);span(gcy-x,gcx-y,gcx+y);}if(d<0)d+=2*x+3;else{d+=2*(x-y)+5;y--;}x++;}for(let j=0;j<G;j++)for(let i=rMin[j];i<=rMax[j];i++)if(i>=0&&i<G)f[j][i]=1;}
+function fillThreshold(G,cx,cy,R,f){const R2=R*R;const lo=Math.max(0,Math.floor(cx-R-1)),hi=Math.min(G-1,Math.ceil(cx+R+1));const lt=Math.max(0,Math.floor(cy-R-1)),ht=Math.min(G-1,Math.ceil(cy+R+1));for(let j=lt;j<=ht;j++)for(let i=lo;i<=hi;i++){const nx=Math.max(i,Math.min(i+1,cx)),ny=Math.max(j,Math.min(j+1,cy));if((nx-cx)**2+(ny-cy)**2<=R2)f[j][i]=1;}}
+function computeFilled(G,cx,cy,R){const f=Array.from({length:G},()=>new Uint8Array(G));if(algo==='euclidean')fillEuclidean(G,cx,cy,R,f);else if(algo==='bresenham')fillBresenham(G,cx,cy,R,f);else fillThreshold(G,cx,cy,R,f);return f;}
+function applyRenderMode(f,G){if(renderMode==='filled')return f;const border=Array.from({length:G},()=>new Uint8Array(G));for(let j=0;j<G;j++)for(let i=0;i<G;i++){if(!f[j][i])continue;if(j===0||!f[j-1][i]||j===G-1||!f[j+1][i]||i===0||!f[j][i-1]||i===G-1||!f[j][i+1])border[j][i]=1;}if(renderMode==='thin')return border;const thick=Array.from({length:G},()=>new Uint8Array(G));for(let j=0;j<G;j++)for(let i=0;i<G;i++){if(!f[j][i])continue;if(border[j][i]){thick[j][i]=1;continue;}const hasH=(i>0&&border[j][i-1])||(i<G-1&&border[j][i+1]);const hasV=(j>0&&border[j-1][i])||(j<G-1&&border[j+1][i]);if(hasH&&hasV)thick[j][i]=1;}return thick;}
+
+/* ══ DRAW ════════════════════════════════════ */
+function snap(v){return Math.floor(v)+0.5;}
+function drawGrid(tc,G,ps,sz,lw){tc.save();tc.strokeStyle=C().gridLine;tc.lineWidth=lw||1;tc.beginPath();for(let k=0;k<=G;k++){const v=snap(k*ps);tc.moveTo(v,0);tc.lineTo(v,sz);tc.moveTo(0,v);tc.lineTo(sz,v);}tc.stroke();tc.restore();}
+function drawPerfectCircle(tc,cx,cy,R,ps){const scrCX=cx*ps,scrCY=cy*ps,scrR=R*ps;if(scrR<1)return;const steps=Math.ceil(2*Math.PI*scrR*8);const seen=new Set();tc.fillStyle=C().circleArc;for(let s=0;s<steps;s++){const a=(s/steps)*Math.PI*2;const sx=Math.floor(scrCX+Math.cos(a)*scrR),sy=Math.floor(scrCY+Math.sin(a)*scrR);const k=sx*65536+sy;if(!seen.has(k)){seen.add(k);tc.fillRect(sx,sy,1,1);}}}
+function drawCenterLines(tc,G,cx,cy,ps,sz){if(!showCenter||sliderActive)return;const isEvenD=(cx===Math.floor(cx));tc.save();if(isEvenD){tc.strokeStyle=C().centerEven;tc.lineWidth=1;const lx=snap(cx*ps),ly=snap(cy*ps);tc.beginPath();tc.moveTo(lx,0);tc.lineTo(lx,sz);tc.moveTo(0,ly);tc.lineTo(sz,ly);tc.stroke();}else{const ci=Math.floor(cx),cj=Math.floor(cy),px=Math.floor(ci*ps),py=Math.floor(cj*ps),pw=Math.ceil(ps),ph=Math.ceil(ps);tc.fillStyle=C().centerOdd;tc.fillRect(px,0,pw,sz);tc.fillRect(0,py,sz,ph);}tc.restore();}
+
+function renderViewport(tc,ox,oy,ps,G,cx,cy,R,f,sz,forDownload){
+  tc.imageSmoothingEnabled=false;
+  tc.fillStyle=C().bg;tc.fillRect(0,0,sz,sz);
+  tc.fillStyle=C().gridBg;tc.fillRect(Math.floor(ox),Math.floor(oy),Math.ceil(G*ps),Math.ceil(G*ps));
+  tc.fillStyle=C().pixel;
+  for(let j=0;j<G;j++)for(let i=0;i<G;i++)if(f[j][i])tc.fillRect(Math.floor(ox+i*ps),Math.floor(oy+j*ps),Math.ceil(ps),Math.ceil(ps));
+  tc.save();tc.translate(Math.floor(ox),Math.floor(oy));drawGrid(tc,G,ps,Math.ceil(G*ps),forDownload?5:1);tc.restore();
+  if(!forDownload){
+    if(showCircle){tc.save();tc.translate(Math.floor(ox),Math.floor(oy));drawPerfectCircle(tc,cx,cy,R,ps);tc.restore();}
+    tc.save();tc.translate(Math.floor(ox),Math.floor(oy));drawCenterLines(tc,G,cx,cy,ps,Math.ceil(G*ps));tc.restore();
+  }
+}
+
+/* ── Main draw ── */
+function draw(){
+  const sz=getSize();
+  mainCanvas.width=mainCanvas.height=sz;
+  ctx.imageSmoothingEnabled=false;
+  cCont.style.width=cCont.style.height=sz+'px';
+  // Always sync widths of rows to canvas width in portrait
+  if(!isLandscape()){
+    const w=sz+'px';
+    renderRow.style.width=w;algoRow.style.width=w;diamBox.style.width=w;
+  }else{
+    renderRow.style.width='';algoRow.style.width='';diamBox.style.width='100%';
+  }
+  fitTitle();updateInfo();drawThumb();syncOverlay(sliderActive);
+  const D=diameter,R=radius;
+  if(!D){ctx.fillStyle=C().bg;ctx.fillRect(0,0,sz,sz);return;}
+  const pad=Math.max(3,Math.ceil(D*.15));
+  const G=D+pad*2,cx=G/2,cy=G/2;
+  const fRaw=computeFilled(G,cx,cy,R);
+  const f=applyRenderMode(fRaw,G);
+  if(showZoom){const margin=2.5,vL=Math.max(0,cx-R-margin),vT=Math.max(0,cy-R-margin);const vS=Math.max((cx+margin)-vL,(cy+margin)-vT);const zps=sz/vS;renderViewport(ctx,-vL*zps,-vT*zps,zps,G,cx,cy,R,f,sz,false);}
+  else{renderViewport(ctx,0,0,sz/G,G,cx,cy,R,f,sz,false);}
+}
+
+/* ── Download ── */
+function downloadPNG(){const size=4000;const off=document.createElement('canvas');off.width=off.height=size;const otx=off.getContext('2d');otx.imageSmoothingEnabled=false;const D=diameter;if(!D)return;const pad=Math.max(3,Math.ceil(D*.15));const G=D+pad*2,cx=G/2,cy=G/2;const fRaw=computeFilled(G,cx,cy,radius);const f=applyRenderMode(fRaw,G);renderViewport(otx,0,0,size/G,G,cx,cy,radius,f,size,true);const a=document.createElement('a');a.download=`pixel-circle-d${D}-${renderMode}-${algo}.png`;a.href=off.toDataURL('image/png');a.click();}
+
+/* ── Events ── */
+function onSliderChange(){diameter=parseInt(diamSl.value);radius=diameter/2;setTrack(diameter);draw();}
+diamSl.addEventListener('mousedown',()=>{sliderActive=true;draw();});
+diamSl.addEventListener('touchstart',()=>{sliderActive=true;draw();},{passive:true});
+window.addEventListener('mouseup',()=>{if(sliderActive){sliderActive=false;draw();}});
+window.addEventListener('touchend',()=>{if(sliderActive){sliderActive=false;draw();}});
+diamSl.addEventListener('input',onSliderChange);
+document.querySelectorAll('.rnd-opt').forEach(opt=>{opt.addEventListener('click',()=>{renderMode=opt.dataset.mode;document.querySelectorAll('.rnd-opt').forEach(o=>o.classList.remove('active'));opt.classList.add('active');draw();});});
+document.querySelectorAll('.algo-opt').forEach(opt=>{opt.addEventListener('click',()=>{algo=opt.dataset.algo;document.querySelectorAll('.algo-opt').forEach(o=>o.classList.remove('active'));opt.classList.add('active');draw();});});
+btnCircle.addEventListener('click',()=>{showCircle=!showCircle;btnCircle.classList.toggle('active',showCircle);draw();});
+btnZoom.addEventListener('click',()=>{showZoom=!showZoom;btnZoom.classList.toggle('active',showZoom);draw();});
+btnCenter.addEventListener('click',()=>{showCenter=!showCenter;btnCenter.classList.toggle('active',showCenter);draw();});
+btnTheme.addEventListener('click',()=>{isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');draw();});
+btnDownload.addEventListener('click',downloadPNG);
+new ResizeObserver(()=>draw()).observe(cWrap);
+new ResizeObserver(()=>drawThumb()).observe(document.getElementById('diam-slider-wrap'));
+window.addEventListener('resize',()=>draw());
+setTrack(diameter);draw();
+</script>
+</body>
+</html>
