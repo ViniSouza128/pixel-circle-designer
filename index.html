@@ -1,24 +1,9 @@
 <!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- SEO básico -->https://github.com/ViniSouza128/pixel-circle-designer/blob/main/index.html
-<title>Pixel Circle Generator - Interactive Pixel Art Tool</title>
-
-<meta name="description" content="Interactive pixel circle generator for pixel art and grid-based design. Create perfect circles and ellipses with real-time visualization.">
-
-<meta name="keywords" content="pixel circle generator, pixel art circle, circle generator grid, pixel shape tool, ellipse generator">
-
-<!-- Open Graph (preview quando manda link) -->
-<meta property="og:title" content="Pixel Circle Generator">
-<meta property="og:description" content="Create pixel-perfect circles and ellipses with real-time visualization.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://vinisouza128.github.io/pixel-circle-designer/">
-
-<!-- Favicons (dark / light automático) -->
-<link rel="icon" id="favicon" href="favicon_light.png">
-
+<title>Pixel Circle Designer</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@500;700&display=swap');
 
@@ -131,15 +116,7 @@
   body.ellipse .diam-box{--thumb:44px;height:calc(var(--thumb)+30px);}
 
   .diam-slider-wrap{width:100%;position:relative;padding:calc(var(--thumb)/2) 0;}
-  input.diamRange{
-  ...
-  background:
-    linear-gradient(to right,
-      var(--red) 0%,
-      var(--red) calc(var(--pct,0%) - (var(--thumb)/2)),
-      var(--gl) calc(var(--pct,0%) - (var(--thumb)/2)),
-      var(--gl) 100%);
-}
+  input.diamRange{-webkit-appearance:none;appearance:none;width:100%;height:13px;border-radius:6px;outline:none;cursor:pointer;display:block;background:linear-gradient(to right,var(--red) 0%,var(--red) var(--pct,0%),var(--gl) var(--pct,0%),var(--gl) 100%);}
   input.diamRange::-webkit-slider-thumb{-webkit-appearance:none;width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2px solid var(--red-lt);cursor:pointer;}
   input.diamRange::-moz-range-thumb{width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2px solid var(--red-lt);cursor:pointer;}
   .thumb-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
@@ -592,10 +569,8 @@ function drawThumb(slEl,tcEl,boxEl,val,max,subLabel){
   tcEl.style.width=r.width+'px';tcEl.style.height=r.height+'px';
   const tc=tcEl.getContext('2d');
   tc.setTransform(dpr,0,0,dpr,0,0);tc.clearRect(0,0,r.width,r.height);
-  const trackW = r.width - T;
-const percent = (val - parseInt(slEl.min)) / (parseInt(slEl.max) - parseInt(slEl.min));
-const cx_t = T/2 + percent * trackW;
-const cy_t = r.height / 2;
+  const trackW=r.width-T;
+  const cx_t=T/2+(val/max)*trackW, cy_t=r.height/2;
   const numStr=String(val);
   const maxW=T*0.76;
   let fsMain=Math.max(4,Math.floor(T*0.36));
@@ -905,17 +880,7 @@ btnCircle.addEventListener('click',()=>{showCircle=!showCircle;btnCircle.classLi
 btnZoom.addEventListener('click',()=>{showZoom=!showZoom;btnZoom.classList.toggle('active',showZoom);draw();});
 btnCenter.addEventListener('click',()=>{showCenter=!showCenter;btnCenter.classList.toggle('active',showCenter);draw();});
 btnGrid.addEventListener('click',()=>{showGrid=!showGrid;btnGrid.classList.toggle('active',showGrid);draw();});
-btnTheme.addEventListener('click',()=>{
-  isDark=!isDark;
-
-  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
-
-  // troca favicon junto com o tema
-  const favicon = document.getElementById('favicon');
-  favicon.href = isDark ? 'favicon_dark.png' : 'favicon_light.png';
-
-  draw();
-});
+btnTheme.addEventListener('click',()=>{isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');draw();});
 btnDownload.addEventListener('click',downloadPNG);
 
 /* Debounce ResizeObserver to avoid loop notifications */
