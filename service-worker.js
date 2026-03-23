@@ -1,9 +1,9 @@
 self.addEventListener("install", event => {
-  self.skipWaiting(); // 🔥 força ativação imediata
+  self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(self.clients.claim()); // 🔥 controla a página
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener("fetch", event => {
