@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -381,7 +381,7 @@ const THM={
   dark:{bg:'#0b0b0f',gridBg:'#13131c',gridLine:'#1e1e2c',pixel:'#e03030',circleArc:'#ff9bbc',centerLine:'rgba(200,140,140,0.16)'},
   light:{bg:'#f2ede2',gridBg:'#ece8de',gridLine:'#bfb8a8',pixel:'#c82020',circleArc:'#7a1040',centerLine:'rgba(100,30,30,0.22)'},
 };
-let isDark=true;
+let isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 const C=()=>isDark?THM.dark:THM.light;
 
 let algo='euclidean',renderMode='filled';
