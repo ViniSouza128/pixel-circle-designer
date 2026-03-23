@@ -24,21 +24,23 @@
   html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;transition:background .25s,color .25s;}
 
   /* ═══════════════════════════════════════
-     PORTRAIT — body is a plain flex column
-     (UNCHANGED from v22)
+     PORTRAIT — slightly tighter padding
+     so size box reaches closer to bottom
   ═══════════════════════════════════════ */
-  body{display:flex;flex-direction:column;align-items:center;padding:0 3dvw 6.5dvh;}
+  body{display:flex;flex-direction:column;align-items:center;
+       padding:0 2dvw 3dvh;}   /* was 0 3dvw 6.5dvh */
 
-  #header-area{flex-shrink:0;height:13dvh;width:100%;display:flex;align-items:center;justify-content:center;}
+  #header-area{flex-shrink:0;height:11dvh;width:100%;  /* was 13dvh */
+    display:flex;align-items:center;justify-content:center;}
   #h1p{font-family:'Press Start 2P',monospace;font-size:1rem;color:var(--text-hi);white-space:nowrap;line-height:1.2;}
 
   #canvas-wrap{flex:1 1 0;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
   #canvas-container{position:relative;flex-shrink:0;border-radius:var(--radius);overflow:hidden;}
   canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 
-  #gap-render{height:12px;flex-shrink:0;}
-  #gap1{height:12px;flex-shrink:0;}   /* same as gap-render (equal spacing) */
-  #gap2{height:12px;flex-shrink:0;}
+  #gap-render{height:10px;flex-shrink:0;}  /* was 12px */
+  #gap1      {height:10px;flex-shrink:0;}
+  #gap2      {height:10px;flex-shrink:0;}
 
   #render-row,#algo-row{flex-shrink:0;display:flex;justify-content:center;gap:10px;align-items:stretch;}
   .rnd-opt,.algo-opt{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;padding:10px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);transition:border-color .15s,background .15s;user-select:none;}
@@ -57,7 +59,12 @@
   input#diamSl::-webkit-slider-thumb{-webkit-appearance:none;width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2.5px solid var(--red-lt);box-shadow:none;cursor:pointer;}
   input#diamSl::-moz-range-thumb{width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2.5px solid var(--red-lt);box-shadow:none;cursor:pointer;}
   #thumb-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
-  #diam-label{font-size:clamp(1.2rem,2.7vw,1.7rem);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+
+  /* SIZE label — same font size as pill labels */
+  #diam-label{
+    font-size:clamp(.68rem,1.35vw,.9rem);   /* matches .rnd-name / .algo-name */
+    font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:3px;
+  }
 
   #h1-ls{display:none;}
 
@@ -68,11 +75,9 @@
   #ov-diam .sym{font-family:sans-serif;font-size:1.25em;font-weight:700;}
   #ov-rad{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(0.9rem,2.5vw,2rem);color:rgba(255,255,255,0.58);letter-spacing:0.02em;line-height:1;margin-top:1px;}
 
-  /* ── Surface ── */
   .surface{background:rgba(11,11,15,0.88);border:1px solid var(--border);border-radius:var(--radius);transition:border-color .15s,background .15s;}
   html[data-theme="light"] .surface{background:rgba(242,237,226,0.92);}
 
-  /* ── Canvas overlay buttons ── */
   #canvas-btns-top{position:absolute;top:10px;right:10px;display:flex;gap:7px;}
   #canvas-btns-bot{position:absolute;bottom:10px;right:10px;display:flex;gap:7px;}
   #canvas-info{position:absolute;bottom:10px;left:10px;}
@@ -82,21 +87,14 @@
   #info-btn{width:var(--btn);height:var(--btn);font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;color:var(--red-lt);}
   #info-btn:hover{border-color:var(--border-hi);color:var(--text-hi);}
   #info-btn.active{background:rgba(224,48,48,.24);border-color:var(--border-hi);color:var(--text-hi);}
-
-  /* Info chip — adaptive: scrollable on narrow screens */
   #info-chip{
-    display:none;
-    padding:10px 14px;
+    display:none;padding:10px 14px;
     font-size:clamp(0.62rem,1.8vw,.88rem);
-    font-weight:700; color:var(--red-lt);
-    letter-spacing:.04em; line-height:1.9;
-    white-space:nowrap; cursor:pointer;
-    /* keep it inside the canvas on narrow screens */
-    max-width: min(260px, calc(100vw - 120px));
-    overflow-x: hidden;
-    overflow-y: auto;
-    white-space: normal;       /* wrap on very narrow */
-    word-break: break-word;
+    font-weight:700;color:var(--red-lt);
+    letter-spacing:.04em;line-height:1.9;
+    white-space:normal;word-break:break-word;cursor:pointer;
+    max-width:min(260px,calc(100vw - 120px));
+    overflow-y:auto;
   }
   #info-chip:hover{border-color:var(--border-hi);}
 
@@ -106,88 +104,37 @@
   @media (orientation:landscape) {
     body{
       display:grid;
-      grid-template-columns: clamp(64px,8dvw,92px) 1fr clamp(64px,8dvw,92px);
-      grid-template-rows: auto 1fr auto;
-      grid-template-areas:
-        ". title ."
-        "left canvas right"
-        ". slider .";
-      padding:1.5dvh 2dvw;
-      gap:8px;
-      align-items:stretch;
-      flex-direction:unset;
+      grid-template-columns:clamp(64px,8dvw,92px) 1fr clamp(64px,8dvw,92px);
+      grid-template-rows:auto 1fr auto;
+      grid-template-areas:". title ." "left canvas right" ". slider .";
+      padding:1.5dvh 2dvw;gap:8px;align-items:stretch;flex-direction:unset;
     }
     #header-area{display:none!important;}
-    #gap-render{display:none!important;}
-    #gap1{display:none!important;}
-    #gap2{display:none!important;}
-
-    #h1-ls{
-      display:block; grid-area:title;
-      align-self:center; justify-self:center;
-      font-family:'Press Start 2P',monospace;
-      font-size:1rem; color:var(--text-hi);
-      white-space:nowrap; line-height:1.2;
-    }
-
-    /* Canvas fills the grid area entirely */
-    #canvas-wrap{
-      grid-area:canvas;
-      display:flex; align-items:stretch; justify-content:stretch;
-      flex:unset; width:unset; min-height:0; overflow:hidden;
-    }
-    #canvas-container{
-      /* JS sets exact pixel dimensions */
-      border-radius:var(--radius); overflow:hidden;
-    }
-
-    /* Left: render pills */
-    #render-row{
-      grid-area:left;
-      flex-direction:column; gap:8px;
-      align-items:stretch; justify-content:stretch;
-    }
-    .rnd-opt{
-      flex:1 1 0; flex-direction:column;
-      align-items:center; justify-content:center;
-      gap:8px; padding:10px 6px; min-height:0;
-    }
+    #gap-render{display:none!important;}#gap1{display:none!important;}#gap2{display:none!important;}
+    #h1-ls{display:block;grid-area:title;align-self:center;justify-self:center;font-family:'Press Start 2P',monospace;font-size:1rem;color:var(--text-hi);white-space:nowrap;line-height:1.2;}
+    #canvas-wrap{grid-area:canvas;display:flex;align-items:stretch;justify-content:stretch;flex:unset;width:unset;min-height:0;overflow:hidden;}
+    #canvas-container{border-radius:var(--radius);overflow:hidden;}
+    #render-row{grid-area:left;flex-direction:column;gap:8px;align-items:stretch;justify-content:stretch;}
+    .rnd-opt{flex:1 1 0;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px 6px;min-height:0;}
     .rnd-icon{font-size:clamp(1rem,2dvh,1.5rem);}
     .rnd-name{font-size:clamp(0.7rem,1.5dvh,1rem);white-space:nowrap;}
-
-    /* Right: algo pills */
-    #algo-row{
-      grid-area:right;
-      flex-direction:column; gap:8px;
-      align-items:stretch; justify-content:stretch;
-    }
-    .algo-opt{
-      flex:1 1 0; flex-direction:column;
-      align-items:center; justify-content:center;
-      gap:8px; padding:10px 6px; min-height:0;
-    }
+    #algo-row{grid-area:right;flex-direction:column;gap:8px;align-items:stretch;justify-content:stretch;}
+    .algo-opt{flex:1 1 0;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px 6px;min-height:0;}
     .algo-dot{width:14px;height:14px;}
     .algo-name{font-size:clamp(0.7rem,1.5dvh,1rem);white-space:nowrap;}
-
-    /* Slider */
-    #diam-box{
-      grid-area:slider; width:100%;
-      padding:0 12px 6px; --thumb:60px;
-    }
+    #diam-box{grid-area:slider;width:100%;padding:0 12px 6px;--thumb:60px;}
     #diam-slider-wrap{padding:calc(var(--thumb)/2) 0;}
     input#diamSl{height:12px;border-radius:6px;}
     input#diamSl::-webkit-slider-thumb{width:var(--thumb);height:var(--thumb);}
     input#diamSl::-moz-range-thumb{width:var(--thumb);height:var(--thumb);}
-    #diam-label{font-size:clamp(1rem,2.2dvh,1.8rem);margin-top:2px;}
+    #diam-label{font-size:clamp(0.7rem,1.5dvh,1rem);margin-top:2px;}  /* same as pill labels */
   }
 </style>
 </head>
 <body>
 
-<!-- Portrait header -->
 <div id="header-area"><h1 id="h1p">Pixel Circle Designer</h1></div>
 
-<!-- Canvas -->
 <div id="canvas-wrap">
   <div id="canvas-container">
     <canvas id="c"></canvas>
@@ -211,8 +158,17 @@
       <button class="c-btn surface active" id="btnCenter" title="Toggle center guides">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="2" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/></svg>
       </button>
-      <button class="c-btn surface active" id="btnCircle" title="Perfect circle overlay">
+      <button class="c-btn surface" id="btnCircle" title="Perfect circle overlay">
         <svg width="20" height="20" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="13" cy="13" r="9"/></svg>
+      </button>
+      <button class="c-btn surface active" id="btnGrid" title="Toggle grid">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <rect x="2" y="2" width="20" height="20" rx="2"/>
+          <line x1="9"  y1="2"  x2="9"  y2="22"/>
+          <line x1="15" y1="2"  x2="15" y2="22"/>
+          <line x1="2"  y1="9"  x2="22" y2="9"/>
+          <line x1="2"  y1="15" x2="22" y2="15"/>
+        </svg>
       </button>
       <button class="c-btn surface" id="btnZoom" title="Zoom top-left">
         <svg width="20" height="20" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7.5"/><line x1="17" y1="17" x2="23.5" y2="23.5"/><line x1="8.5" y1="11" x2="13.5" y2="11"/><line x1="11" y1="8.5" x2="11" y2="13.5"/></svg>
@@ -221,44 +177,19 @@
   </div>
 </div>
 
-<!-- Portrait spacers -->
 <div id="gap-render"></div>
-
-<!-- Render row -->
 <div id="render-row">
-  <label class="rnd-opt active" data-mode="filled">
-    <span class="rnd-icon">●</span><span class="rnd-name">Filled</span>
-    <input type="radio" name="rmode" value="filled" checked hidden>
-  </label>
-  <label class="rnd-opt" data-mode="thin">
-    <span class="rnd-icon">○</span><span class="rnd-name">Thin</span>
-    <input type="radio" name="rmode" value="thin" hidden>
-  </label>
-  <label class="rnd-opt" data-mode="thick">
-    <span class="rnd-icon">◎</span><span class="rnd-name">Thick</span>
-    <input type="radio" name="rmode" value="thick" hidden>
-  </label>
+  <label class="rnd-opt active" data-mode="filled"><span class="rnd-icon">●</span><span class="rnd-name">Filled</span><input type="radio" name="rmode" value="filled" checked hidden></label>
+  <label class="rnd-opt" data-mode="thin"><span class="rnd-icon">○</span><span class="rnd-name">Thin</span><input type="radio" name="rmode" value="thin" hidden></label>
+  <label class="rnd-opt" data-mode="thick"><span class="rnd-icon">◎</span><span class="rnd-name">Thick</span><input type="radio" name="rmode" value="thick" hidden></label>
 </div>
 <div id="gap1"></div>
-
-<!-- Algo row -->
 <div id="algo-row">
-  <label class="algo-opt active" data-algo="euclidean">
-    <span class="algo-dot"></span><span class="algo-name">Euclidean</span>
-    <input type="radio" name="algo" value="euclidean" checked hidden>
-  </label>
-  <label class="algo-opt" data-algo="bresenham">
-    <span class="algo-dot"></span><span class="algo-name">Bresenham</span>
-    <input type="radio" name="algo" value="bresenham" hidden>
-  </label>
-  <label class="algo-opt" data-algo="threshold">
-    <span class="algo-dot"></span><span class="algo-name">Threshold</span>
-    <input type="radio" name="algo" value="threshold" hidden>
-  </label>
+  <label class="algo-opt active" data-algo="euclidean"><span class="algo-dot"></span><span class="algo-name">Euclidean</span><input type="radio" name="algo" value="euclidean" checked hidden></label>
+  <label class="algo-opt" data-algo="bresenham"><span class="algo-dot"></span><span class="algo-name">Bresenham</span><input type="radio" name="algo" value="bresenham" hidden></label>
+  <label class="algo-opt" data-algo="threshold"><span class="algo-dot"></span><span class="algo-name">Threshold</span><input type="radio" name="algo" value="threshold" hidden></label>
 </div>
 <div id="gap2"></div>
-
-<!-- Size slider -->
 <div id="diam-box">
   <div id="diam-slider-wrap">
     <input type="range" id="diamSl" min="0" max="32" step="1" value="16">
@@ -267,7 +198,6 @@
   <span id="diam-label">Size</span>
 </div>
 
-<!-- Landscape title -->
 <h1 id="h1-ls">Pixel Circle Designer</h1>
 
 <script>
@@ -295,39 +225,40 @@ const btnZoom     = document.getElementById('btnZoom');
 const btnTheme    = document.getElementById('btnTheme');
 const btnDownload = document.getElementById('btnDownload');
 const btnCenter   = document.getElementById('btnCenter');
+const btnGrid     = document.getElementById('btnGrid');
 
-/* ── Theme / state ── */
 const ALGO_FULL = {euclidean:'Euclidean Distance',bresenham:'Midpoint Circle (Bresenham)',threshold:'Threshold Coverage'};
 
+/* ── Circle arc colour — palette-aligned ──────
+   Dark:  bright rose-pink  (reads on dark, on red, on grid)
+   Light: deep burgundy     (readable on both creme bg and red circle)
+──────────────────────────────────────────────── */
 const THM = {
   dark: {
     bg:'#0b0b0f', gridBg:'#13131c', gridLine:'#1e1e2c',
     pixel:'#e03030',
-    // Vibrant teal — very visible on dark, looks great
-    circleArc:'#00e5cc',
-    centerEven:'rgba(80,80,102,0.22)', centerOdd:'rgba(80,80,102,0.10)'
+    circleArc:'#ff9bbc',          /* rose-pink, palette-adjacent */
+    centerLine:'rgba(200,160,160,0.30)',  /* very soft warm */
   },
   light: {
     bg:'#f2ede2', gridBg:'#ece8de', gridLine:'#bfb8a8',
     pixel:'#c82020',
-    // Deep cobalt — very visible on light, high contrast
-    circleArc:'#1a3be0',
-    centerEven:'rgba(60,20,10,0.55)', centerOdd:'rgba(60,20,10,0.20)'
+    circleArc:'#7a1040',          /* deep burgundy, palette-adjacent */
+    centerLine:'rgba(100,30,30,0.22)',
   },
 };
 let isDark = true;
 const C = () => isDark ? THM.dark : THM.light;
 
-/* defaults: showCircle + showCenter ON (items 2) */
+/* defaults: center ON, circle OFF, grid ON */
 let diameter=16, radius=8, algo='euclidean', renderMode='filled';
-let showCircle=true, showZoom=false, showCenter=true;
+let showCircle=false, showZoom=false, showCenter=true, showGrid=true;
 let sliderActive=false, infoExpanded=false;
 
 function isLandscape(){ return window.innerWidth > window.innerHeight; }
 function getThumbPx(){ return parseInt(getComputedStyle(diamBox).getPropertyValue('--thumb'))||80; }
 
-/* ── Area table D=0..32 ──────────────────────── */
-const areaTable = Array.from({length:33}, (_,D) => {
+const areaTable = Array.from({length:33}, (_,D)=>{
   if(!D) return 0;
   const r=D/2,cx=D/2,cy=D/2; let a=0;
   for(let j=0;j<D;j++) for(let i=0;i<D;i++)
@@ -337,31 +268,27 @@ const areaTable = Array.from({length:33}, (_,D) => {
 
 function setTrack(v){ diamSl.style.setProperty('--pct',(v/32*100)+'%'); }
 
-/* ── Canvas size ─────────────────────────────── */
 function getCanvasSize(){
   const r = cWrap.getBoundingClientRect();
   if(isLandscape()){
-    // Fill the full available space in the grid cell
-    const w = Math.max(Math.floor(r.width)  - 0, 60);
-    const h = Math.max(Math.floor(r.height) - 0, 40);
+    const w = Math.max(Math.floor(r.width)-0, 60);
+    const h = Math.max(Math.floor(r.height)-0, 40);
     return {w, h};
   } else {
-    const s = Math.max(Math.min(r.width, r.height) - 2, 60);
+    const s = Math.max(Math.min(r.width, r.height)-2, 60);
     return {w:s, h:s};
   }
 }
 
-/* ── Sync portrait widths ────────────────────── */
 function syncWidths(cW){
   if(!isLandscape()){
-    const ws = cW+'px';
+    const ws=cW+'px';
     renderRow.style.width=ws; algoRow.style.width=ws; diamBox.style.width=ws;
   } else {
     renderRow.style.width=''; algoRow.style.width=''; diamBox.style.width='';
   }
 }
 
-/* ── Title fit ───────────────────────────────── */
 function fitTitle(cW){
   const el = isLandscape() ? h1Ls : h1p;
   const targetW = cW || diamBox.getBoundingClientRect().width || 200;
@@ -374,7 +301,6 @@ function fitTitle(cW){
   el.style.fontSize = lo+'px';
 }
 
-/* ── Thumb canvas ────────────────────────────── */
 function drawThumb(){
   const wrap = document.getElementById('diam-slider-wrap');
   const r = wrap.getBoundingClientRect();
@@ -389,7 +315,7 @@ function drawThumb(){
   thumbCtx.clearRect(0,0,r.width,r.height);
   const trackW = r.width - T;
   const cx_t = T/2 + (diameter/32)*trackW, cy_t = r.height/2;
-  const fsSym = Math.round(T*0.47), fsNum = Math.round(T*0.42), fsRad = Math.round(T*0.19);
+  const fsSym=Math.round(T*0.47), fsNum=Math.round(T*0.42), fsRad=Math.round(T*0.19);
   const numStr = String(diameter);
   thumbCtx.textBaseline = 'alphabetic';
   thumbCtx.font = `700 ${fsSym}px sans-serif`;
@@ -397,35 +323,28 @@ function drawThumb(){
   thumbCtx.font = `700 ${fsNum}px "JetBrains Mono",monospace`;
   const numW = thumbCtx.measureText(numStr).width;
   const sx = cx_t - (symW+1+numW)/2;
-  const capH1 = fsSym*0.72, capH2 = fsRad*0.72;
+  const capH1=fsSym*0.72, capH2=fsRad*0.72;
   const y1 = cy_t - (capH1+4+capH2)/2 + capH1;
   thumbCtx.fillStyle = '#ffffff';
-  thumbCtx.font = `700 ${fsSym}px sans-serif`;
-  thumbCtx.fillText('⌀', sx, y1);
-  thumbCtx.font = `700 ${fsNum}px "JetBrains Mono",monospace`;
-  thumbCtx.fillText(numStr, sx+symW+1, y1);
-  thumbCtx.font      = `700 ${fsRad}px "JetBrains Mono",monospace`;
+  thumbCtx.font = `700 ${fsSym}px sans-serif`;       thumbCtx.fillText('⌀', sx, y1);
+  thumbCtx.font = `700 ${fsNum}px "JetBrains Mono",monospace`; thumbCtx.fillText(numStr, sx+symW+1, y1);
+  thumbCtx.font = `700 ${fsRad}px "JetBrains Mono",monospace`;
   thumbCtx.fillStyle = 'rgba(255,255,255,0.65)';
-  thumbCtx.textAlign = 'center'; thumbCtx.textBaseline = 'middle';
+  thumbCtx.textAlign='center'; thumbCtx.textBaseline='middle';
   thumbCtx.fillText(`r${radius}`, cx_t, y1+4+fsRad*0.5);
 }
 
-/* ── Overlay + info ──────────────────────────── */
 function syncOverlay(v){
-  ovSym.textContent = v ? '⌀' : '';
-  ovNum.textContent = v ? String(diameter) : '';
-  ovRad.textContent = v ? `r${radius}` : '';
+  ovSym.textContent=v?'⌀':''; ovNum.textContent=v?String(diameter):''; ovRad.textContent=v?`r${radius}`:'';
   diamOverlay.classList.toggle('visible', v);
 }
 function updateInfo(){
-  infoChip.innerHTML =
-    `Diameter  ${diameter}<br>Radius  ${radius}<br>`+
-    `Area  ${areaTable[diameter]??0}<br>Algorithm  ${ALGO_FULL[algo]}`;
+  infoChip.innerHTML=`Diameter  ${diameter}<br>Radius  ${radius}<br>Area  ${areaTable[diameter]??0}<br>Algorithm  ${ALGO_FULL[algo]}`;
 }
 function toggleInfo(){
-  infoExpanded = !infoExpanded;
-  infoBtnEl.style.display  = infoExpanded ? 'none' : 'flex';
-  infoChip.style.display   = infoExpanded ? 'block' : 'none';
+  infoExpanded=!infoExpanded;
+  infoBtnEl.style.display=infoExpanded?'none':'flex';
+  infoChip.style.display=infoExpanded?'block':'none';
 }
 infoBtnEl.addEventListener('click', toggleInfo);
 infoChip.addEventListener('click',  toggleInfo);
@@ -440,87 +359,98 @@ function applyRenderMode(f,G){if(renderMode==='filled')return f;const b=Array.fr
 /* ══ DRAW HELPERS ════════════════════════════ */
 function snap(v){ return Math.floor(v) + 0.5; }
 
-/*
-  Extended grid: draw grid lines across the FULL canvas (not just the G×G square).
-  Lines follow the same ps spacing, tiled from the circle's grid offset.
-*/
 function drawExtendedGrid(tc, ps, ox, oy, cW, cH, lw){
   tc.save();
   tc.strokeStyle = C().gridLine; tc.lineWidth = lw || 1;
   tc.beginPath();
-  // Start x from the first grid line at or before canvas left edge
   const sx = ox - Math.ceil(ox / ps) * ps;
   const sy = oy - Math.ceil(oy / ps) * ps;
-  for(let x = sx; x <= cW + ps; x += ps){ const v=snap(x); tc.moveTo(v,0); tc.lineTo(v,cH); }
-  for(let y = sy; y <= cH + ps; y += ps){ const v=snap(y); tc.moveTo(0,v); tc.lineTo(cW,v); }
+  for(let x=sx; x<=cW+ps; x+=ps){ const v=snap(x); tc.moveTo(v,0); tc.lineTo(v,cH); }
+  for(let y=sy; y<=cH+ps; y+=ps){ const v=snap(y); tc.moveTo(0,v); tc.lineTo(cW,v); }
   tc.stroke(); tc.restore();
 }
 
 function drawPerfectCircle(tc, cx, cy, R, ps){
   const scrCX=cx*ps, scrCY=cy*ps, scrR=R*ps;
-  if(scrR < 1) return;
-  const steps = Math.ceil(2*Math.PI*scrR*8);
-  const seen = new Set();
-  tc.fillStyle = C().circleArc;
-  for(let s=0; s<steps; s++){
-    const a = (s/steps)*Math.PI*2;
-    const sx = Math.floor(scrCX + Math.cos(a)*scrR);
-    const sy = Math.floor(scrCY + Math.sin(a)*scrR);
-    const k = sx*65536 + sy;
-    if(!seen.has(k)){ seen.add(k); tc.fillRect(sx, sy, 1, 1); }
+  if(scrR<1) return;
+  const steps=Math.ceil(2*Math.PI*scrR*8);
+  const seen=new Set();
+  tc.fillStyle=C().circleArc;
+  for(let s=0;s<steps;s++){
+    const a=(s/steps)*Math.PI*2;
+    const sx=Math.floor(scrCX+Math.cos(a)*scrR);
+    const sy=Math.floor(scrCY+Math.sin(a)*scrR);
+    const k=sx*65536+sy;
+    if(!seen.has(k)){ seen.add(k); tc.fillRect(sx,sy,1,1); }
   }
 }
 
-function drawCenterLines(tc, G, cx, cy, ps, cW, cH){
+/*
+  Center guide lines:
+  ODD D  → 1 column + 1 row (centre pixel)
+  EVEN D → 2 columns + 2 rows (centre is between pixels)
+  All drawn as transparent fill strips (no border lines),
+  spanning the full canvas.
+*/
+function drawCenterLines(tc, cx, cy, ps, cW, cH){
   if(!showCenter || sliderActive) return;
-  const isEven = (cx === Math.floor(cx));
+  const isEvenD = (cx === Math.floor(cx));  // cx is integer for even D
   tc.save();
-  if(isEven){
-    tc.strokeStyle = C().centerEven; tc.lineWidth = 1;
-    const lx = snap(cx*ps), ly = snap(cy*ps);
-    tc.beginPath();
-    tc.moveTo(lx, 0); tc.lineTo(lx, cH);
-    tc.moveTo(0, ly); tc.lineTo(cW, ly);
-    tc.stroke();
+  tc.fillStyle = C().centerLine;
+
+  if(isEvenD){
+    // Two columns: floor(cx)-1  and  floor(cx)
+    const c1 = Math.floor(cx) - 1;
+    const c2 = Math.floor(cx);
+    tc.fillRect(Math.floor(c1*ps), 0, Math.ceil(ps), cH);
+    tc.fillRect(Math.floor(c2*ps), 0, Math.ceil(ps), cH);
+    // Two rows: floor(cy)-1  and  floor(cy)
+    const r1 = Math.floor(cy) - 1;
+    const r2 = Math.floor(cy);
+    tc.fillRect(0, Math.floor(r1*ps), cW, Math.ceil(ps));
+    tc.fillRect(0, Math.floor(r2*ps), cW, Math.ceil(ps));
   } else {
-    const ci=Math.floor(cx), cj=Math.floor(cy);
-    tc.fillStyle = C().centerOdd;
+    // One column + one row through the centre pixel
+    const ci = Math.floor(cx), cj = Math.floor(cy);
     tc.fillRect(Math.floor(ci*ps), 0, Math.ceil(ps), cH);
     tc.fillRect(0, Math.floor(cj*ps), cW, Math.ceil(ps));
   }
   tc.restore();
 }
 
-/* ── Core renderer ───────────────────────────── */
 function renderViewport(tc, ox, oy, ps, G, cx, cy, R, f, cW, cH, forDownload){
   tc.imageSmoothingEnabled = false;
-
-  // Background fills whole canvas
   tc.fillStyle = C().bg;     tc.fillRect(0,0,cW,cH);
   tc.fillStyle = C().gridBg; tc.fillRect(0,0,cW,cH);
 
-  // Circle pixels
+  // Filled pixels
   tc.fillStyle = C().pixel;
   for(let j=0;j<G;j++) for(let i=0;i<G;i++)
     if(f[j][i]) tc.fillRect(Math.floor(ox+i*ps), Math.floor(oy+j*ps), Math.ceil(ps), Math.ceil(ps));
 
-  // Grid (extended across full canvas)
-  drawExtendedGrid(tc, ps, ox, oy, cW, cH, forDownload ? 5 : 1);
+  // Grid (extended, or skipped if hidden)
+  if(showGrid || forDownload){
+    drawExtendedGrid(tc, ps, ox, oy, cW, cH, forDownload ? 5 : 1);
+  }
 
   if(!forDownload){
+    // Circle overlay (relative to circle origin)
     if(showCircle){
-      // perfect circle is relative to circle center in canvas coords
       tc.save(); tc.translate(Math.floor(ox), Math.floor(oy));
       drawPerfectCircle(tc, cx, cy, R, ps);
       tc.restore();
     }
-    // center lines span full canvas — pass canvas dimensions
-    drawCenterLines(tc, G, cx, cy, ps, cW, cH);
+    // Center guides (absolute canvas coords — ox/oy already baked in via ox+i*ps)
+    if(showCenter){
+      tc.save(); tc.translate(Math.floor(ox), Math.floor(oy));
+      drawCenterLines(tc, cx, cy, ps, G*ps, G*ps);
+      tc.restore();
+    }
   }
 }
 
 /* ── Main draw ───────────────────────────────── */
-function getPad(D, ls){ return ls ? Math.max(2, Math.ceil(D*0.10)) : Math.max(3, Math.ceil(D*0.15)); }
+function getPad(D, ls){ return ls ? Math.max(2,Math.ceil(D*0.10)) : Math.max(3,Math.ceil(D*0.15)); }
 
 function draw(){
   const ls = isLandscape();
@@ -536,7 +466,7 @@ function draw(){
   fitTitle(cW);
   updateInfo(); drawThumb(); syncOverlay(sliderActive);
 
-  const D = diameter, R = radius;
+  const D=diameter, R=radius;
   if(!D){ ctx.fillStyle=C().bg; ctx.fillRect(0,0,cW,cH); return; }
 
   const pad = getPad(D, ls);
@@ -544,31 +474,30 @@ function draw(){
   const fRaw = computeFilled(G, cx, cy, R);
   const f = applyRenderMode(fRaw, G);
 
-  // ps: always limit by the smaller dimension so circle stays proportional
   const ps = Math.min(cW, cH) / G;
   const ox = (cW - G*ps) / 2;
   const oy = (cH - G*ps) / 2;
 
   if(showZoom){
     const margin = ls ? 1.5 : 2.5;
-    const vL = Math.max(0, cx-R-margin), vT = Math.max(0, cy-R-margin);
-    const vS = Math.max((cx+margin)-vL, (cy+margin)-vT);
-    const zps = Math.min(cW,cH) / vS;
-    const zox = (cW - G*zps)/2, zoy = (cH - G*zps)/2;
-    renderViewport(ctx, -vL*zps+zox, -vT*zps+zoy, zps, G, cx, cy, R, f, cW, cH, false);
+    const vL=Math.max(0,cx-R-margin), vT=Math.max(0,cy-R-margin);
+    const vS=Math.max((cx+margin)-vL,(cy+margin)-vT);
+    const zps=Math.min(cW,cH)/vS;
+    const zox=(cW-G*zps)/2, zoy=(cH-G*zps)/2;
+    renderViewport(ctx,-vL*zps+zox,-vT*zps+zoy,zps,G,cx,cy,R,f,cW,cH,false);
   } else {
     renderViewport(ctx, ox, oy, ps, G, cx, cy, R, f, cW, cH, false);
   }
 }
 
-/* ── Download 4000×4000 ──────────────────────── */
+/* ── Download ────────────────────────────────── */
 function downloadPNG(){
   const size=4000;
   const off=document.createElement('canvas'); off.width=off.height=size;
   const otx=off.getContext('2d'); otx.imageSmoothingEnabled=false;
   const D=diameter; if(!D) return;
   const pad=getPad(D,false);
-  const G=D+pad*2, cx=G/2, cy=G/2;
+  const G=D+pad*2,cx=G/2,cy=G/2;
   const fRaw=computeFilled(G,cx,cy,radius);
   const f=applyRenderMode(fRaw,G);
   const ps=size/G;
@@ -585,20 +514,18 @@ diamSl.addEventListener('touchstart', ()=>{ sliderActive=true; draw(); }, {passi
 window.addEventListener('mouseup',    ()=>{ if(sliderActive){ sliderActive=false; draw(); } });
 window.addEventListener('touchend',   ()=>{ if(sliderActive){ sliderActive=false; draw(); } });
 diamSl.addEventListener('input', onSliderChange);
-
 document.querySelectorAll('.rnd-opt').forEach(o=>{o.addEventListener('click',()=>{renderMode=o.dataset.mode;document.querySelectorAll('.rnd-opt').forEach(x=>x.classList.remove('active'));o.classList.add('active');draw();});});
 document.querySelectorAll('.algo-opt').forEach(o=>{o.addEventListener('click',()=>{algo=o.dataset.algo;document.querySelectorAll('.algo-opt').forEach(x=>x.classList.remove('active'));o.classList.add('active');draw();});});
-
 btnCircle.addEventListener('click',   ()=>{ showCircle=!showCircle;  btnCircle.classList.toggle('active',showCircle);  draw(); });
 btnZoom.addEventListener('click',     ()=>{ showZoom=!showZoom;      btnZoom.classList.toggle('active',showZoom);      draw(); });
 btnCenter.addEventListener('click',   ()=>{ showCenter=!showCenter;  btnCenter.classList.toggle('active',showCenter);  draw(); });
+btnGrid.addEventListener('click',     ()=>{ showGrid=!showGrid;      btnGrid.classList.toggle('active',showGrid);      draw(); });
 btnTheme.addEventListener('click',    ()=>{ isDark=!isDark; document.documentElement.setAttribute('data-theme',isDark?'dark':'light'); draw(); });
 btnDownload.addEventListener('click', downloadPNG);
 
 new ResizeObserver(()=>draw()).observe(cWrap);
 new ResizeObserver(()=>drawThumb()).observe(document.getElementById('diam-slider-wrap'));
 window.addEventListener('resize', ()=>draw());
-
 setTrack(diameter);
 requestAnimationFrame(()=>requestAnimationFrame(draw));
 </script>
