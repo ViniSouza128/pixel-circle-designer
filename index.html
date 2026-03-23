@@ -27,11 +27,14 @@
   body{display:flex;flex-direction:column;align-items:center;padding:0 2dvw 2dvh;overflow:hidden;max-width:100dvw;}
 
   #header-area{
-    flex-shrink:0;
-    /* item 2: no fixed height — just padding above/below the title */
-    padding:1.5dvh 0 1dvh;
-    width:100%;display:flex;align-items:center;justify-content:center;
-  }
+  flex-shrink:0;
+  width:100%;
+  display:flex;
+  justify-content:center;
+
+  margin-top:1.5dvh;
+  margin-bottom:var(--gap);
+}
   #h1p{font-family:'Press Start 2P',monospace;font-size:3.5dvh;color:var(--muted);white-space:nowrap;line-height:1.2;}
   /* item 2: landscape title same colour as portrait title */
   body.ls #h1-ls{font-family:'Press Start 2P',monospace;font-size:3dvh;color:var(--muted);white-space:nowrap;line-height:1.2;}
@@ -173,7 +176,7 @@
   }
   body.ls #header-area{display:none!important;}
   body.ls #gap-render,body.ls #gap1,body.ls #gap2{display:none!important;}
-  body.ls #h1-ls{display:block;grid-area:title;align-self:center;justify-self:center;font-family:'Press Start 2P',monospace;font-size:3dvh;color:var(--muted);white-space:nowrap;line-height:1.2;}
+  body.ls #h1-ls{display:block;align-self:center;justify-self:center;font-family:'Press Start 2P',monospace;font-size:3dvh;color:var(--muted);white-space:nowrap;line-height:1.2;}
   /* canvas-wrap fills its grid cell; frame fills wrap */
   body.ls #canvas-wrap{grid-area:canvas;overflow:hidden;min-width:0;min-height:0;display:flex;align-items:stretch;justify-content:stretch;flex:unset;width:unset;}
   /* Frame fills wrap completely; canvas is centered inside via JS ox/oy */
@@ -199,12 +202,45 @@
   body.ls .diam-label{font-size:clamp(.4rem,1.3dvh,.85rem);margin-top:1px;}
   body.ls.ellipse .diam-box{--thumb:45px;}
   body.ls.ellipse #render-row,body.ls.ellipse #algo-row{height:unset;}
+  
+  #title-box{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+
+  padding:12px clamp(12px, 4vw, 28px);
+}
+
+#title-box-ls{
+  grid-area:title;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+
+  padding:10px;
+}
+#title-box h1,
+#title-box-ls h1{
+  max-width:100%;
+  overflow:hidden;
+}
 </style>
 </head>
 <body>
 
 <div id="header-area">
-  <h1 id="h1p">Pixel <span class="mode-word" id="modeToggleP"></span> Designer</h1>
+  <div id="title-box">
+    <h1 id="h1p">Pixel <span class="mode-word" id="modeToggleP"></span> Designer</h1>
+  </div>
 </div>
 
 <div id="canvas-wrap">
@@ -284,8 +320,9 @@
     <span class="diam-label">Height</span>
   </div>
 </div>
-<h1 id="h1-ls">Pixel <span class="mode-word" id="modeToggleLS"></span> Designer</h1>
-
+<div id="title-box-ls">
+  <h1 id="h1-ls">Pixel <span class="mode-word" id="modeToggleLS"></span> Designer</h1>
+</div>
 <script>
 /* Suppress ResizeObserver loop notification (benign browser quirk) */
 window.addEventListener('error', e=>{if(e.message&&e.message.includes('ResizeObserver'))e.stopImmediatePropagation();});
@@ -494,7 +531,12 @@ function syncWidths(cW){
     // canvas width may be different (square) — controls stretch to fill body width
     const bodyW=Math.floor(window.innerWidth*.96)-4;
     const ws=bodyW+'px';
-    renderRow.style.width=ws;algoRow.style.width=ws;boxesRow.style.width=ws;
+    renderRow.style.width=ws;
+algoRow.style.width=ws;
+boxesRow.style.width=ws;
+
+const titleBox = document.getElementById('title-box');
+if(titleBox) titleBox.style.width = ws;
     // Also force canvas frame to match body width in portrait
     // (getCanvasSize returns square based on available height/width)
     // The canvas stays square; we just ensure controls align to body edges
@@ -505,7 +547,12 @@ function fitTitle(cW){
   const el=isLS?h1Ls:h1p;
   // item 2: title size based on its actual rendered line height (3.5dvh cap)
   const maxH=Math.min(Math.floor(window.innerHeight*.035), 40);
-  const targetW=!isLS&&isEllipse?controlsWidth():cW;
+  const box = isLS 
+  ? document.getElementById('title-box-ls') 
+  : document.getElementById('title-box');
+
+const padding = 40; // margem de segurança (padding + borda)
+const targetW = (box?.clientWidth || cW) - padding;
   if(!targetW)return;
   el.style.fontSize=maxH+'px';
   if(el.scrollWidth<=targetW)return;
