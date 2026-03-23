@@ -1,0 +1,20 @@
+{
+  "name": "Pixel Circle Generator",
+  "short_name": "Pixel Circle",
+  "start_url": "/pixel-circle-designer/",
+  "display": "standalone",
+  "background_color": "#0b0b0f",
+  "theme_color": "#0b0b0f",
+  "icons": [
+    {
+      "src": "favicon_light.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon_light.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
