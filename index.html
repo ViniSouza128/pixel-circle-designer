@@ -12,176 +12,153 @@
     --border:rgba(224,48,48,0.32); --border-hi:rgba(224,48,48,0.72);
     --red:#e03030; --red-lt:#ff8080; --red-dim:rgba(224,48,48,0.16);
     --gl:#1e1e2c; --muted:#4a4666; --text:#d4d0ef; --text-hi:#ffffff;
-    --radius:12px; --thumb:80px; --btn:44px; --gap:8px;
-    /* canvas button states — dark mode */
-    --cbtn-active-bg: rgba(224,48,48,0.28);
-    --cbtn-active-border: rgba(224,48,48,0.72);
+    --radius:12px; --thumb:60px; --btn:44px; --gap:8px;
   }
   html[data-theme="light"] {
     --bg:#f2ede2; --surface:rgba(0,0,0,0.04);
     --border:rgba(170,30,30,0.30); --border-hi:rgba(170,30,30,0.68);
-    --red:#cc2020; --red-lt:#dd4444; --red-dim:rgba(200,32,32,0.12);
+    --red:#cc2020; --red-lt:#dd4444; --red-dim:rgba(200,32,32,0.14);
     --gl:#bfb8a8; --muted:#8a7060; --text:#2a1f1a; --text-hi:#0a0506;
-    /* light mode canvas button active = same family as outer pill buttons */
-    --cbtn-active-bg: rgba(200,32,32,0.14);
-    --cbtn-active-border: rgba(170,30,30,0.68);
   }
-
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;transition:background .25s,color .25s;}
 
-  /* ═══════════════════════════════════════
-     PORTRAIT  (default — body.pt class set by JS)
-  ═══════════════════════════════════════ */
-  body{display:flex;flex-direction:column;align-items:center;padding:0 2dvw 2dvh;}
+  body{display:flex;flex-direction:column;align-items:center;padding:0 2dvw 2dvh;overflow:hidden;max-width:100dvw;}
 
   #header-area{flex-shrink:0;height:11dvh;width:100%;display:flex;align-items:center;justify-content:center;}
   #h1p{font-family:'Press Start 2P',monospace;font-size:3.5dvh;color:var(--text-hi);white-space:nowrap;line-height:1.2;}
+  .mode-word{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px;transition:color .15s;}
+  .mode-word:hover{color:var(--red-lt);}
+  html[data-theme="light"] .mode-word:hover{color:var(--red);}
   #h1-ls{display:none;}
 
+  /* Canvas: flex:1 grows to fill remaining height */
   #canvas-wrap{flex:1 1 0;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;}
   #canvas-frame{position:relative;border:1px solid var(--gl);border-radius:var(--radius);overflow:hidden;flex-shrink:1;display:inline-flex;}
   canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;}
 
+  /* Gaps */
   #gap-render{height:var(--gap);flex-shrink:0;}
-  #gap1{height:var(--gap);flex-shrink:0;}
-  #gap2{height:var(--gap);flex-shrink:0;}
+  #gap1      {height:var(--gap);flex-shrink:0;}
+  #gap2      {height:var(--gap);flex-shrink:0;}
 
-  #render-row,#algo-row{flex-shrink:0;display:flex;justify-content:center;gap:var(--gap);align-items:stretch;height:56px;}
-  .rnd-opt,.algo-opt{flex:1 1 0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);transition:border-color .15s,background .15s;user-select:none;min-width:0;overflow:hidden;}
+  /* Pill rows */
+  #render-row,#algo-row{flex-shrink:0;display:flex;justify-content:center;gap:var(--gap);align-items:stretch;height:52px;}
+  body.ellipse #render-row, body.ellipse #algo-row{height:42px;}
+  body.ellipse #gap-render, body.ellipse #gap1{height:5px;}
+  body.ellipse #gap2{height:5px;}
+
+  .rnd-opt,.algo-opt{
+    flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;
+    cursor:pointer;padding:4px 5px;border-radius:var(--radius);
+    border:1px solid var(--border);background:var(--surface);
+    transition:border-color .15s,background .15s;user-select:none;overflow:hidden;
+  }
   .rnd-opt:hover,.algo-opt:hover{border-color:var(--border-hi);background:rgba(224,48,48,.08);}
   .rnd-opt.active,.algo-opt.active{border-color:var(--border-hi);background:var(--red-dim);}
-  .rnd-icon{font-size:clamp(.7rem,1.6vw,1rem);line-height:1;color:var(--muted);transition:color .15s;flex-shrink:0;}
+  .rnd-icon{font-size:.95rem;line-height:1;color:var(--muted);transition:color .15s;flex-shrink:0;}
   .rnd-opt.active .rnd-icon{color:var(--red-lt);}
-  .rnd-name,.algo-name{font-size:clamp(0.5rem,1.3vw,.82rem);font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transition:color .15s;}
+  .rnd-name,.algo-name{font-size:.85rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transition:color .15s;max-width:100%;overflow:hidden;}
   .rnd-opt.active .rnd-name,.algo-opt.active .algo-name{color:var(--red-lt);}
   .algo-dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--muted);flex-shrink:0;transition:background .15s,border-color .15s;}
   .algo-opt.active .algo-dot{background:var(--red);border-color:var(--red-lt);}
 
-  #diam-box{flex-shrink:0;display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0 16px 6px;height:calc(var(--thumb) + 40px);}
-  #diam-slider-wrap{width:100%;position:relative;padding:calc(var(--thumb)/2) 0;}
-  input#diamSl{-webkit-appearance:none;appearance:none;width:100%;height:16px;border-radius:8px;outline:none;cursor:pointer;display:block;background:linear-gradient(to right,var(--red) 0%,var(--red) var(--pct,0%),var(--gl) var(--pct,0%),var(--gl) 100%);}
-  input#diamSl::-webkit-slider-thumb{-webkit-appearance:none;width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2.5px solid var(--red-lt);box-shadow:none;cursor:pointer;}
-  input#diamSl::-moz-range-thumb{width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2.5px solid var(--red-lt);box-shadow:none;cursor:pointer;}
-  #thumb-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
-  #diam-label{font-size:clamp(0.5rem,1.3vw,.82rem);font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+  /* Slider boxes — flexible height in ellipse mode */
+  #diam-boxes-row{flex-shrink:0;display:flex;flex-direction:column;gap:5px;width:100%;}
+  .diam-box{
+    display:flex;flex-direction:column;align-items:center;
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:0 14px 5px;flex-shrink:0;
+  }
+  /* Circle mode: single slider at default thumb size */
+  #box-size{height:calc(var(--thumb)+38px);}
+  /* Ellipse mode: 2 compact sliders, auto height */
+  body.ellipse .diam-box{--thumb:44px;height:calc(var(--thumb)+30px);}
 
-  /* Overlay — solid stroke, no shadow */
+  .diam-slider-wrap{width:100%;position:relative;padding:calc(var(--thumb)/2) 0;}
+  input.diamRange{-webkit-appearance:none;appearance:none;width:100%;height:13px;border-radius:6px;outline:none;cursor:pointer;display:block;background:linear-gradient(to right,var(--red) 0%,var(--red) var(--pct,0%),var(--gl) var(--pct,0%),var(--gl) 100%);}
+  input.diamRange::-webkit-slider-thumb{-webkit-appearance:none;width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2px solid var(--red-lt);cursor:pointer;}
+  input.diamRange::-moz-range-thumb{width:var(--thumb);height:var(--thumb);border-radius:50%;background:var(--red);border:2px solid var(--red-lt);cursor:pointer;}
+  .thumb-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;}
+  .diam-label{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:1px;white-space:nowrap;}
+
+  /* Overlay */
   #diam-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .12s;gap:2px;}
   #diam-overlay.visible{opacity:1;}
-  #ov-diam{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(3rem,10vw,7rem);color:#ffffff;-webkit-text-stroke:3px rgba(0,0,0,0.55);text-stroke:3px rgba(0,0,0,0.55);paint-order:stroke fill;letter-spacing:-0.01em;line-height:1;display:flex;align-items:baseline;}
+  #ov-diam{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(2rem,8vw,6rem);color:#ffffff;-webkit-text-stroke:3px rgba(0,0,0,0.55);text-stroke:3px rgba(0,0,0,0.55);paint-order:stroke fill;letter-spacing:-0.01em;line-height:1;display:flex;align-items:baseline;}
   html[data-theme="light"] #ov-diam{color:#1a0a0a;-webkit-text-stroke:3px rgba(255,255,255,0.55);text-stroke:3px rgba(255,255,255,0.55);}
-  #ov-diam .sym{font-family:sans-serif;font-size:1.25em;font-weight:700;}
-  #ov-rad{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(.9rem,2.5vw,2rem);color:rgba(255,255,255,0.85);-webkit-text-stroke:2px rgba(0,0,0,0.45);text-stroke:2px rgba(0,0,0,0.45);paint-order:stroke fill;letter-spacing:.02em;line-height:1;}
+  #ov-diam .sym{font-family:sans-serif;font-size:1.1em;font-weight:700;}
+  #ov-rad{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(.75rem,2vw,1.6rem);color:rgba(255,255,255,0.8);-webkit-text-stroke:2px rgba(0,0,0,0.45);text-stroke:2px rgba(0,0,0,0.45);paint-order:stroke fill;letter-spacing:.02em;line-height:1;}
   html[data-theme="light"] #ov-rad{color:rgba(20,5,5,0.85);-webkit-text-stroke:2px rgba(255,255,255,0.45);}
 
-  /* Surface */
   .surface{background:rgba(11,11,15,.88);border:1px solid var(--border);border-radius:var(--radius);transition:border-color .15s,background .15s;}
   html[data-theme="light"] .surface{background:rgba(242,237,226,.92);}
 
-  /* ── Canvas buttons — use CSS vars for active state ──
-     Item 1: light mode active state now visible/intuitive
-  ── */
+  /* Canvas buttons */
   #canvas-btns-tl{position:absolute;top:8px;left:8px;display:flex;gap:6px;}
   #canvas-btns-tr{position:absolute;top:8px;right:8px;display:flex;gap:6px;}
   #canvas-btns-br{position:absolute;bottom:8px;right:8px;display:flex;flex-direction:column;gap:6px;}
   #canvas-info{position:absolute;bottom:8px;left:8px;}
 
-  .c-btn{
-    width:var(--btn);height:var(--btn);
-    cursor:pointer;display:flex;align-items:center;justify-content:center;
-    user-select:none;flex-shrink:0;
-    color:var(--red-lt);
-    /* inactive = dim */
-    background:transparent;
-  }
-  .c-btn:hover{border-color:var(--border-hi);background:var(--cbtn-active-bg);color:var(--text-hi);}
-  .c-btn.active{
-    background:var(--cbtn-active-bg);
-    border-color:var(--cbtn-active-border);
-    color:var(--red-lt);
-  }
-  /* Make inactive canvas buttons more visible in light mode */
+  .c-btn{width:var(--btn);height:var(--btn);cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;flex-shrink:0;color:var(--red-lt);}
+  .c-btn:hover{border-color:var(--border-hi);background:rgba(224,48,48,.18);color:var(--text-hi);}
+  .c-btn.active{background:rgba(224,48,48,.28);border-color:rgba(224,48,48,.72);color:var(--red-lt);}
   html[data-theme="light"] .c-btn{color:var(--red);}
-  html[data-theme="light"] .c-btn.active{color:var(--red);border-color:var(--cbtn-active-border);}
+  html[data-theme="light"] .c-btn.active{background:var(--red-dim);border-color:var(--border-hi);color:var(--red);}
+  html[data-theme="light"] .c-btn:hover{background:var(--red-dim);color:var(--red);}
 
-  #info-btn{
-    width:var(--btn);height:var(--btn);
-    font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;
-    user-select:none;color:var(--red-lt);
-  }
+  #info-btn{width:var(--btn);height:var(--btn);font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;color:var(--red-lt);}
   #info-btn:hover{border-color:var(--border-hi);color:var(--text-hi);}
-  #info-btn.active{background:var(--cbtn-active-bg);border-color:var(--cbtn-active-border);color:var(--red-lt);}
+  #info-btn.active{background:rgba(224,48,48,.28);border-color:rgba(224,48,48,.72);color:var(--red-lt);}
   html[data-theme="light"] #info-btn{color:var(--red);}
+  html[data-theme="light"] #info-btn.active{background:var(--red-dim);border-color:var(--border-hi);color:var(--red);}
 
-  #info-chip{
-    display:none;padding:8px 12px;
-    font-weight:700;color:var(--red-lt);
-    letter-spacing:.04em;line-height:1.65;
-    white-space:nowrap;cursor:pointer;
-    max-height:calc(var(--btn)*3 + 6px*2);
-    overflow:hidden;
-  }
+  #info-chip{display:none;flex-direction:column;justify-content:center;padding:0 11px;font-weight:700;color:var(--red-lt);letter-spacing:.04em;line-height:1.6;white-space:nowrap;cursor:pointer;height:calc(var(--btn)*2);overflow:hidden;}
+  #info-chip.open{display:flex;}
   #info-chip:hover{border-color:var(--border-hi);}
   html[data-theme="light"] #info-chip{color:var(--red);}
 
-  /* ═══════════════════════════════════════
-     LANDSCAPE — .ls class on body (set by JS math)
-  ═══════════════════════════════════════ */
-  body.ls {
+  /* ═══════════ LANDSCAPE ═══════════ */
+  body.ls{
     display:grid;
-    grid-template-columns:clamp(56px,8dvw,88px) 1fr clamp(56px,8dvw,88px);
+    grid-template-columns:clamp(50px,7dvw,82px) 1fr clamp(50px,7dvw,82px);
     grid-template-rows:auto 1fr auto;
     grid-template-areas:". title ." "left canvas right" ". slider .";
-    padding:1.5dvh 2dvw; gap:8px;
-    align-items:stretch; flex-direction:unset; overflow:hidden;
+    padding:1.5dvh 2dvw;gap:8px;align-items:stretch;flex-direction:unset;
+    overflow:hidden;max-width:100dvw;
   }
   body.ls #header-area{display:none!important;}
-  body.ls #gap-render{display:none!important;}
-  body.ls #gap1{display:none!important;}
-  body.ls #gap2{display:none!important;}
-  body.ls #h1-ls{
-    display:block;grid-area:title;
-    align-self:center;justify-self:center;
-    font-family:'Press Start 2P',monospace;
-    font-size:3dvh;color:var(--text-hi);white-space:nowrap;line-height:1.2;
-  }
-  body.ls #canvas-wrap{
-    grid-area:canvas;overflow:hidden;
-    min-width:0;min-height:0;
-    display:flex;align-items:stretch;justify-content:stretch;
-    flex:unset;width:unset;
-  }
-  body.ls #canvas-frame{
-    flex:1 1 0;min-width:0;min-height:0;
-    display:flex;align-items:center;justify-content:center;
-  }
-  body.ls #render-row{
-    grid-area:left;flex-direction:column;gap:8px;
-    align-items:stretch;justify-content:stretch;height:unset;
-  }
-  body.ls .rnd-opt{flex:1 1 0;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:8px 5px;min-height:0;}
-  body.ls .rnd-icon{font-size:clamp(.9rem,2dvh,1.4rem);}
-  body.ls .rnd-name{font-size:clamp(0.5rem,1.4dvh,.95rem);white-space:nowrap;}
-  body.ls #algo-row{
-    grid-area:right;flex-direction:column;gap:8px;
-    align-items:stretch;justify-content:stretch;height:unset;
-  }
-  body.ls .algo-opt{flex:1 1 0;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:8px 5px;min-height:0;}
-  body.ls .algo-dot{width:13px;height:13px;}
-  body.ls .algo-name{font-size:clamp(0.5rem,1.4dvh,.95rem);white-space:nowrap;}
-  body.ls #diam-box{grid-area:slider;width:100%;padding:0 12px 6px;height:unset;--thumb:60px;}
-  body.ls #diam-slider-wrap{padding:calc(var(--thumb)/2) 0;}
-  body.ls input#diamSl{height:12px;border-radius:6px;}
-  body.ls input#diamSl::-webkit-slider-thumb{width:var(--thumb);height:var(--thumb);}
-  body.ls input#diamSl::-moz-range-thumb{width:var(--thumb);height:var(--thumb);}
-  body.ls #diam-label{font-size:clamp(0.5rem,1.4dvh,.95rem);margin-top:2px;}
+  body.ls #gap-render,body.ls #gap1,body.ls #gap2{display:none!important;}
+  body.ls #h1-ls{display:block;grid-area:title;align-self:center;justify-self:center;font-family:'Press Start 2P',monospace;font-size:3dvh;color:var(--text-hi);white-space:nowrap;line-height:1.2;}
+  body.ls #canvas-wrap{grid-area:canvas;overflow:hidden;min-width:0;min-height:0;display:flex;align-items:stretch;justify-content:stretch;flex:unset;width:unset;}
+  /* In landscape, frame fills wrap completely — canvas inside uses ox/oy offsets */
+  body.ls #canvas-frame{flex:1 1 0;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);overflow:hidden;}
+  body.ls #render-row{grid-area:left;flex-direction:column;gap:8px;align-items:stretch;justify-content:stretch;height:unset;}
+  body.ls .rnd-opt{flex:1 1 0;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:5px 3px;min-height:0;overflow:hidden;}
+  body.ls .rnd-icon{font-size:clamp(.8rem,2.2dvh,1.3rem);}
+  body.ls .rnd-name{font-size:1rem;white-space:nowrap;overflow:hidden;max-width:100%;}
+  body.ls #algo-row{grid-area:right;flex-direction:column;gap:8px;align-items:stretch;justify-content:stretch;height:unset;}
+  body.ls .algo-opt{flex:1 1 0;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:5px 3px;min-height:0;overflow:hidden;}
+  body.ls .algo-dot{width:11px;height:11px;}
+  body.ls .algo-name{font-size:1rem;white-space:nowrap;overflow:hidden;max-width:100%;}
+  /* Landscape sliders: side by side in ellipse mode */
+  body.ls #diam-boxes-row{grid-area:slider;flex-direction:row;gap:8px;}
+  body.ls .diam-box{flex:1 1 0;padding:0 10px 4px;height:unset;--thumb:45px;}
+  body.ls .diam-slider-wrap{padding:calc(var(--thumb)/2) 0;}
+  body.ls input.diamRange{height:10px;border-radius:5px;}
+  body.ls input.diamRange::-webkit-slider-thumb{width:var(--thumb);height:var(--thumb);}
+  body.ls input.diamRange::-moz-range-thumb{width:var(--thumb);height:var(--thumb);}
+  body.ls .diam-label{font-size:clamp(.4rem,1.3dvh,.85rem);margin-top:1px;}
+  /* Landscape ellipse: same slider layout (row) — already set above */
+  body.ls.ellipse .diam-box{--thumb:45px;}
+  body.ls.ellipse #render-row,body.ls.ellipse #algo-row{height:unset;}
 </style>
 </head>
 <body>
 
-<div id="header-area"><h1 id="h1p">Pixel Circle Designer</h1></div>
+<div id="header-area">
+  <h1 id="h1p">Pixel <span class="mode-word" id="modeToggleP">Circle</span> Designer</h1>
+</div>
 
 <div id="canvas-wrap">
   <div id="canvas-frame">
@@ -190,8 +167,6 @@
       <span id="ov-diam"><span class="sym"></span><span id="ov-num"></span></span>
       <span id="ov-rad"></span>
     </div>
-
-    <!-- item 2: theme first, then grid -->
     <div id="canvas-btns-tl">
       <button class="c-btn surface" id="btnTheme" title="Toggle light/dark">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.9" y2="7.1"/><line x1="4.9" y1="19.1" x2="7.1" y2="16.9"/></svg>
@@ -200,25 +175,22 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="9" y1="2" x2="9" y2="22"/><line x1="15" y1="2" x2="15" y2="22"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="2" y1="15" x2="22" y2="15"/></svg>
       </button>
     </div>
-
     <div id="canvas-btns-tr">
       <button class="c-btn surface" id="btnDownload" title="Download PNG">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="15"/><polyline points="7,10 12,15 17,10"/><line x1="4" y1="20" x2="20" y2="20"/></svg>
       </button>
     </div>
-
     <div id="canvas-btns-br">
+      <button class="c-btn surface" id="btnCircle" title="Perfect circle/ellipse overlay">
+        <svg width="20" height="20" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="13" cy="13" r="9"/></svg>
+      </button>
       <button class="c-btn surface" id="btnCenter" title="Toggle center guides">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="2" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/></svg>
-      </button>
-      <button class="c-btn surface" id="btnCircle" title="Perfect circle overlay">
-        <svg width="20" height="20" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="13" cy="13" r="9"/></svg>
       </button>
       <button class="c-btn surface" id="btnZoom" title="Zoom top-left">
         <svg width="20" height="20" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7.5"/><line x1="17" y1="17" x2="23.5" y2="23.5"/><line x1="8.5" y1="11" x2="13.5" y2="11"/><line x1="11" y1="8.5" x2="11" y2="13.5"/></svg>
       </button>
     </div>
-
     <div id="canvas-info">
       <button id="info-btn" class="surface" title="Info">i</button>
       <div id="info-chip" class="surface"></div>
@@ -239,134 +211,221 @@
   <label class="algo-opt" data-algo="threshold"><span class="algo-dot"></span><span class="algo-name">Threshold</span><input type="radio" name="algo" value="threshold" hidden></label>
 </div>
 <div id="gap2"></div>
-<div id="diam-box">
-  <div id="diam-slider-wrap">
-    <input type="range" id="diamSl" min="0" max="32" step="1" value="16">
-    <canvas id="thumb-canvas"></canvas>
+
+<div id="diam-boxes-row">
+  <div class="diam-box" id="box-size">
+    <div class="diam-slider-wrap" id="sw-size">
+      <input class="diamRange" id="slSize" type="range" min="0" max="32" step="1" value="16">
+      <canvas class="thumb-canvas" id="tc-size"></canvas>
+    </div>
+    <span class="diam-label">Size</span>
   </div>
-  <span id="diam-label">Size</span>
+  <div class="diam-box" id="box-width" style="display:none">
+    <div class="diam-slider-wrap" id="sw-width">
+      <input class="diamRange" id="slWidth" type="range" min="1" max="32" step="1" value="20">
+      <canvas class="thumb-canvas" id="tc-width"></canvas>
+    </div>
+    <span class="diam-label">Width</span>
+  </div>
+  <div class="diam-box" id="box-height" style="display:none">
+    <div class="diam-slider-wrap" id="sw-height">
+      <input class="diamRange" id="slHeight" type="range" min="1" max="32" step="1" value="12">
+      <canvas class="thumb-canvas" id="tc-height"></canvas>
+    </div>
+    <span class="diam-label">Height</span>
+  </div>
 </div>
-<h1 id="h1-ls">Pixel Circle Designer</h1>
+<h1 id="h1-ls">Pixel <span class="mode-word" id="modeToggleLS">Circle</span> Designer</h1>
 
 <script>
-const mainCanvas  = document.getElementById('c');
-const ctx         = mainCanvas.getContext('2d');
-const cFrame      = document.getElementById('canvas-frame');
-const cWrap       = document.getElementById('canvas-wrap');
-const renderRow   = document.getElementById('render-row');
-const algoRow     = document.getElementById('algo-row');
-const diamBox     = document.getElementById('diam-box');
-const diamSl      = document.getElementById('diamSl');
-const thumbCv     = document.getElementById('thumb-canvas');
-const thumbCtx    = thumbCv.getContext('2d');
-const infoBtnEl   = document.getElementById('info-btn');
-const infoChip    = document.getElementById('info-chip');
-const diamOverlay = document.getElementById('diam-overlay');
-const ovNum       = document.getElementById('ov-num');
-const ovSym       = diamOverlay.querySelector('.sym');
-const ovRad       = document.getElementById('ov-rad');
-const h1p         = document.getElementById('h1p');
-const h1Ls        = document.getElementById('h1-ls');
-const btnCircle   = document.getElementById('btnCircle');
-const btnZoom     = document.getElementById('btnZoom');
-const btnTheme    = document.getElementById('btnTheme');
-const btnDownload = document.getElementById('btnDownload');
-const btnCenter   = document.getElementById('btnCenter');
-const btnGrid     = document.getElementById('btnGrid');
-const bodyEl      = document.body;
+/* ── DOM ─────────────────────────────────────── */
+const mainCanvas=document.getElementById('c');
+const ctx=mainCanvas.getContext('2d');
+const cFrame=document.getElementById('canvas-frame');
+const cWrap=document.getElementById('canvas-wrap');
+const renderRow=document.getElementById('render-row');
+const algoRow=document.getElementById('algo-row');
+const boxesRow=document.getElementById('diam-boxes-row');
+const boxSize=document.getElementById('box-size');
+const boxWidth=document.getElementById('box-width');
+const boxHeight=document.getElementById('box-height');
+const slSize=document.getElementById('slSize');
+const slWidth=document.getElementById('slWidth');
+const slHeight=document.getElementById('slHeight');
+const tcSize=document.getElementById('tc-size');
+const tcWidth=document.getElementById('tc-width');
+const tcHeight=document.getElementById('tc-height');
+const infoBtnEl=document.getElementById('info-btn');
+const infoChip=document.getElementById('info-chip');
+const diamOverlay=document.getElementById('diam-overlay');
+const ovNum=document.getElementById('ov-num');
+const ovSym=diamOverlay.querySelector('.sym');
+const ovRad=document.getElementById('ov-rad');
+const h1p=document.getElementById('h1p');
+const h1Ls=document.getElementById('h1-ls');
+const btnCircle=document.getElementById('btnCircle');
+const btnZoom=document.getElementById('btnZoom');
+const btnTheme=document.getElementById('btnTheme');
+const btnDownload=document.getElementById('btnDownload');
+const btnCenter=document.getElementById('btnCenter');
+const btnGrid=document.getElementById('btnGrid');
+const bodyEl=document.body;
 
-const ALGO_FULL = {euclidean:'Euclidean Distance',bresenham:'Midpoint Circle (Bresenham)',threshold:'Threshold Coverage'};
-const THM = {
+const ALGO_FULL={euclidean:'Euclidean Distance',bresenham:'Midpoint Circle (Bresenham)',threshold:'Threshold Coverage'};
+const THM={
   dark: {bg:'#0b0b0f',gridBg:'#13131c',gridLine:'#1e1e2c',pixel:'#e03030',circleArc:'#ff9bbc',centerLine:'rgba(200,140,140,0.16)'},
   light:{bg:'#f2ede2',gridBg:'#ece8de',gridLine:'#bfb8a8',pixel:'#c82020',circleArc:'#7a1040',centerLine:'rgba(100,30,30,0.22)'},
 };
 let isDark=true;
 const C=()=>isDark?THM.dark:THM.light;
 
-let diameter=16,radius=8,algo='euclidean',renderMode='filled';
+let algo='euclidean',renderMode='filled';
 let showCircle=false,showZoom=false,showCenter=false,showGrid=true;
 let sliderActive=false,infoExpanded=false;
-let isLS=false;
+let isLS=false,isEllipse=false;
 
-const areaTable=Array.from({length:33},(_,D)=>{
-  if(!D) return 0;const r=D/2,cx=D/2,cy=D/2;let a=0;
-  for(let j=0;j<D;j++) for(let i=0;i<D;i++) if(Math.sqrt((i+.5-cx)**2+(j+.5-cy)**2)<=r) a++;
-  return a;
-});
+/* Shape state */
+let diamSize=16, diamW=20, diamH=12;
 
-function setTrack(v){diamSl.style.setProperty('--pct',(v/32*100)+'%');}
+/* ── Padding ── */
+function getPad(d){return Math.max(3,Math.ceil(d*.15));}
 
-/* ── item 3: mathematical breakpoint ─────────────
-   Compute the circle-display size (min-dim of canvas) for
-   both portrait and landscape at current window dimensions.
-   Use whichever layout gives the larger display.
-──────────────────────────────────────────────────── */
-function computeLayoutChoice(){
-  const W = window.innerWidth;
-  const H = window.innerHeight;
-
-  // ── Portrait canvas estimate ──
-  // Fixed vertical space: header + bottom pad + rows + gaps + slider
-  const hdrH   = H * 0.11;             // 11dvh
-  const padB   = H * 0.02;             // 2dvh
-  const rowsH  = 56 + 56;              // render-row + algo-row
-  const gapsH  = 8 * 5;                // 5 gaps (gap-render + gap1 + gap2 + 2 inside body)
-  const sliderH = 80 + 40;             // thumb + extra
-  const ptFixedH = hdrH + padB + rowsH + gapsH + sliderH;
-  const ptCanvasH = H - ptFixedH;
-  const ptCanvasW = W * 0.96;          // body padding 2dvw each side
-  const ptSide = Math.min(ptCanvasW, ptCanvasH);
-
-  // ── Landscape canvas estimate ──
-  const sideCols = Math.min(88, Math.max(56, W * 0.08)) * 2;
-  const lsHPad   = H * 0.03 + H * 0.015;    // padding top + bottom (1.5dvh + 1.5dvh)
-  const lsTitleH = H * 0.04;                  // landscape title row
-  const lsSliderH = 60 + 40;                  // thumb + extra (--thumb:60px in ls)
-  const lsGap    = 8 * 3;                     // 3 gaps in grid rows
-  const lsCanvasW = W - sideCols - W * 0.04;  // subtract cols + side padding
-  const lsCanvasH = H - lsHPad - lsTitleH - lsSliderH - lsGap;
-  const lsMinDim  = Math.min(lsCanvasW, lsCanvasH);
-
-  // Landscape is preferred when it gives a strictly larger circle display
-  return lsMinDim > ptSide;
-}
-
-function getThumbPx(){ return parseInt(getComputedStyle(diamBox).getPropertyValue('--thumb'))||80; }
-
-function applyLayout(){
-  const newLS = computeLayoutChoice();
-  if(newLS !== isLS){
-    isLS = newLS;
-    bodyEl.classList.toggle('ls', isLS);
+/* ── Area counting (filled, algo-independent) ── */
+function countArea(){
+  if(isEllipse){
+    const rx=diamW/2,ry=diamH/2;
+    let a=0;
+    for(let j=0;j<diamH*2;j++)for(let i=0;i<diamW*2;i++){
+      const dx=i+.5-diamW, dy=j+.5-diamH;
+      if((dx/rx)**2+(dy/ry)**2<=1) a++;
+    }
+    return Math.round(a/4); // rough
+  } else {
+    const r=diamSize/2,cx=r,cy=r; let a=0;
+    for(let j=0;j<diamSize;j++)for(let i=0;i<diamSize;i++)
+      if(Math.sqrt((i+.5-cx)**2+(j+.5-cy)**2)<=r) a++;
+    return a;
   }
 }
 
-function getCanvasSize(){
+function setTrack(sl,v,max){sl.style.setProperty('--pct',(v/max*100)+'%');}
+function getThumbPx(box){return parseInt(getComputedStyle(box).getPropertyValue('--thumb'))||60;}
+
+/* ── Ellipse toggle ── */
+function toggleEllipseMode(){
+  isEllipse=!isEllipse;
+  bodyEl.classList.toggle('ellipse',isEllipse);
+  document.querySelectorAll('.mode-word').forEach(el=>{el.textContent=isEllipse?'Ellipse':'Circle';});
+  if(isEllipse){
+    boxSize.style.display='none';
+    boxWidth.style.display='';boxHeight.style.display='';
+    setTrack(slWidth,diamW,32);setTrack(slHeight,diamH,32);
+  }else{
+    boxSize.style.display='';boxWidth.style.display='none';boxHeight.style.display='none';
+    setTrack(slSize,diamSize,32);
+  }
+  draw();
+}
+document.getElementById('modeToggleP').addEventListener('click',toggleEllipseMode);
+document.getElementById('modeToggleLS').addEventListener('click',toggleEllipseMode);
+
+/* ── Layout decision (pure math) ── */
+function computeLayoutScores(){
+  const W=window.innerWidth,H=window.innerHeight;
+  const ptPadH=H*.02,ptHdrH=H*.11,ptRowsH=52+52,ptGapsH=8*5,ptSlider=60+38;
+  const ptFreeH=H-ptPadH-ptHdrH-ptRowsH-ptGapsH-ptSlider;
+  const ptSide=Math.min(W*.96,ptFreeH);
+  const sideCol=Math.min(82,Math.max(50,W*.07));
+  const lsSideW=sideCol*2+W*.04+8*2;
+  const lsFreeW=W-lsSideW, lsFreeH=H-H*.03-H*.04-8-45-38-8;
+  return{pt:ptSide, ls:Math.min(lsFreeW,lsFreeH)};
+}
+
+function applyLayout(){
+  const{pt,ls}=computeLayoutScores();
+  const HYST=6;
+  if(!isLS&&ls>pt+HYST){isLS=true;bodyEl.classList.add('ls');}
+  else if(isLS&&pt>ls+HYST){isLS=false;bodyEl.classList.remove('ls');}
+}
+
+/*
+  Key insight for ellipse grid alignment:
+  Always use a SINGLE ps value so cells are perfectly square.
+  
+  Portrait circle:  canvas=square, ps=side/G, ox=0,oy=0
+  Portrait ellipse: canvas sized to Gc*ps × Gr*ps, ox=0,oy=0
+                    BUT controls use body width (not canvas width)
+  Landscape circle: canvas fills frame, ps=min(cW/G,cH/G), ox/oy center it
+  Landscape ellipse:canvas fills frame, ps=min(cW/Gc,cH/Gr), ox/oy center
+  
+  In ALL cases the extended grid starts at (ox,oy) referenced from frame origin,
+  and since the frame has overflow:hidden it clips correctly.
+*/
+
+let _geoCache=null; // {ps, Gc, Gr, ox, oy, cW, cH}
+
+function computeGeometry(availW,availH){
+  if(isEllipse){
+    const padX=getPad(diamW),padY=getPad(diamH);
+    const Gc=diamW+padX*2, Gr=diamH+padY*2;
+    if(isLS){
+      // canvas fills frame; use ox/oy to center ellipse grid
+      const cW=Math.max(availW,60), cH=Math.max(availH,40);
+      const ps=Math.min(cW/Gc,cH/Gr);
+      const ox=(cW-Gc*ps)/2, oy=(cH-Gr*ps)/2;
+      return{ps,Gc,Gr,ox,oy,cW,cH};
+    } else {
+      // portrait: canvas sized exactly to grid
+      const ps=Math.min(availW/Gc,availH/Gr);
+      const cW=Math.round(Gc*ps), cH=Math.round(Gr*ps);
+      return{ps,Gc,Gr,ox:0,oy:0,cW:Math.max(cW,Gc),cH:Math.max(cH,Gr)};
+    }
+  } else {
+    const D=diamSize; if(!D) return null;
+    const pad=getPad(D), G=D+pad*2;
+    if(isLS){
+      const cW=Math.max(availW,60), cH=Math.max(availH,40);
+      const ps=Math.min(cW/G,cH/G);
+      const ox=(cW-G*ps)/2, oy=(cH-G*ps)/2;
+      return{ps,Gc:G,Gr:G,ox,oy,cW,cH};
+    } else {
+      const side=Math.max(Math.min(availW,availH)-2,60);
+      const ps=side/G;
+      return{ps,Gc:G,Gr:G,ox:0,oy:0,cW:side,cH:side};
+    }
+  }
+}
+
+function getAvailableSpace(){
   if(isLS){
+    // Clear frame so cWrap measurement is clean
     cFrame.style.width=''; cFrame.style.height='';
     const r=cWrap.getBoundingClientRect();
-    return{w:Math.max(Math.floor(r.width),60),h:Math.max(Math.floor(r.height),40)};
+    return{w:Math.floor(r.width),h:Math.floor(r.height)};
   } else {
+    // Collapse frame first, then measure cWrap
     cFrame.style.width='0px'; cFrame.style.height='0px';
     const r=cWrap.getBoundingClientRect();
-    const s=Math.max(Math.min(r.width,r.height)-2,60);
-    return{w:s,h:s};
+    return{w:Math.floor(r.width)-4,h:Math.floor(r.height)-4};
   }
 }
 
 function syncWidths(cW){
   if(!isLS){
-    const ws=cW+'px';
-    renderRow.style.width=ws;algoRow.style.width=ws;diamBox.style.width=ws;
+    // In ellipse portrait mode, controls use body available width (not canvas width)
+    const useW = isEllipse ? Math.floor(window.innerWidth*.96)-4 : cW;
+    const ws=useW+'px';
+    renderRow.style.width=ws;algoRow.style.width=ws;boxesRow.style.width=ws;
   } else {
-    renderRow.style.width='';algoRow.style.width='';diamBox.style.width='';
+    renderRow.style.width='';algoRow.style.width='';boxesRow.style.width='';
   }
 }
 
 function fitTitle(cW){
   const el=isLS?h1Ls:h1p;
-  const maxH=Math.floor(window.innerHeight*0.035);
-  const targetW=cW||diamBox.getBoundingClientRect().width||200;
+  const maxH=Math.floor(window.innerHeight*.035);
+  // Title fits within canvas width OR body width (whichever is relevant)
+  const targetW=isEllipse&&!isLS ? Math.floor(window.innerWidth*.96)-4 : cW;
   if(!targetW) return;
   el.style.fontSize=maxH+'px';
   if(el.scrollWidth<=targetW) return;
@@ -375,78 +434,358 @@ function fitTitle(cW){
   el.style.fontSize=lo+'px';
 }
 
-function updateInfo(){
+function fitPillFonts(){
+  const IDEAL=isLS?14:12,MIN=6;
+  document.querySelectorAll('.rnd-opt,.algo-opt').forEach(opt=>{
+    const nm=opt.querySelector('.rnd-name,.algo-name');
+    if(!nm) return;
+    const avail=opt.getBoundingClientRect().width-8;
+    if(avail<=0) return;
+    nm.style.fontSize=IDEAL+'px';
+    if(nm.scrollWidth<=avail) return;
+    let lo=MIN,hi=IDEAL;
+    for(let i=0;i<15;i++){const m=(lo+hi)/2;nm.style.fontSize=m+'px';nm.scrollWidth<=avail?(lo=m):(hi=m);}
+    nm.style.fontSize=lo+'px';
+  });
+}
+
+function updateInfo(cW){
   const btnPx=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--btn'))||44;
-  const gap=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gap'))||8;
-  const frameR=cFrame.getBoundingClientRect();
-  const chipW=Math.max(frameR.width - btnPx - gap*3 - btnPx, 80);
+  const chipH=btnPx*2;
+  infoChip.style.height=chipH+'px'; infoChip.style.maxHeight=chipH+'px';
+  // Width = from right edge of info-btn to just before BR column
+  const brEdge=cW-8-btnPx;
+  const chipLeft=8+btnPx+8;
+  const chipW=Math.max(brEdge-8-chipLeft,60);
   infoChip.style.width=chipW+'px';
-  const maxH=btnPx*3+gap*2;
-  infoChip.style.maxHeight=maxH+'px';
-  const lines=[`Diameter: ${diameter}`,`Radius: ${radius}`,`Area: ${areaTable[diameter]??0}`,`Algorithm: ${ALGO_FULL[algo]}`];
+
+  const area=countArea();
+  const lines=isEllipse
+    ?[`Width: ${diamW}`,`Height: ${diamH}`,`Area: ${area}`,`Algorithm: ${ALGO_FULL[algo]}`]
+    :[`Diameter: ${diamSize}`,`Radius: ${diamSize/2}`,`Area: ${area}`,`Algorithm: ${ALGO_FULL[algo]}`];
+
   const testEl=document.createElement('span');
   testEl.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font-family:"JetBrains Mono",monospace;font-weight:700;letter-spacing:0.04em;';
   document.body.appendChild(testEl);
-  const chipInnerW=chipW-24;
+  const innerW=chipW-22;
   let bestFs=8;
-  for(let fs=18;fs>=7;fs-=0.5){
-    const totalH=fs*1.65*4+16;
-    if(totalH>maxH) continue;
+  for(let fs=18;fs>=6;fs-=.5){
+    if(fs*1.6*4>chipH) continue;
     testEl.style.fontSize=fs+'px';testEl.textContent=lines[3];
-    if(testEl.scrollWidth<=chipInnerW){bestFs=fs;break;}
+    if(testEl.scrollWidth<=innerW){bestFs=fs;break;}
   }
   document.body.removeChild(testEl);
   infoChip.style.fontSize=bestFs+'px';
-  infoChip.innerHTML=lines.join('<br>');
+  infoChip.innerHTML=lines.map(l=>`<div>${l}</div>`).join('');
 }
 
-function toggleInfo(){infoExpanded=!infoExpanded;infoBtnEl.style.display=infoExpanded?'none':'flex';infoChip.style.display=infoExpanded?'block':'none';}
+function toggleInfo(){
+  infoExpanded=!infoExpanded;
+  infoBtnEl.style.display=infoExpanded?'none':'flex';
+  if(infoExpanded){infoChip.classList.add('open');infoChip.style.display='flex';}
+  else{infoChip.classList.remove('open');infoChip.style.display='none';}
+}
 infoBtnEl.addEventListener('click',toggleInfo);infoChip.addEventListener('click',toggleInfo);
 
-function syncOverlay(v){ovSym.textContent=v?'⌀':'';ovNum.textContent=v?String(diameter):'';ovRad.textContent=v?`r${radius}`:'';diamOverlay.classList.toggle('visible',v);}
+/* ── Thumb canvas: text scales to fit within circle ── */
+function drawThumb(slEl,tcEl,boxEl,val,max,subLabel){
+  const wrap=slEl.parentElement;
+  const r=wrap.getBoundingClientRect(); if(!r.width) return;
+  const T=getThumbPx(boxEl), dpr=window.devicePixelRatio||1;
+  tcEl.width=Math.round(r.width*dpr); tcEl.height=Math.round(r.height*dpr);
+  tcEl.style.width=r.width+'px'; tcEl.style.height=r.height+'px';
+  const tc=tcEl.getContext('2d');
+  tc.setTransform(dpr,0,0,dpr,0,0); tc.clearRect(0,0,r.width,r.height);
 
-/* ══ ALGORITHMS ══════════════════════════════ */
-function fillEuclidean(G,cx,cy,R,f){const R2=R*R;for(let j=0;j<G;j++){const dy=j+.5-cy,dy2=dy*dy;if(dy2>R2)continue;const dx=Math.sqrt(R2-dy2);for(let i=Math.max(0,Math.ceil(cx-dx-.5));i<=Math.min(G-1,Math.floor(cx+dx-.5));i++)f[j][i]=1;}}
-function fillBresenham(G,cx,cy,R,f){const iR=Math.floor(R),isEven=(cx===Math.floor(cx));if(iR===0){if(!isEven){const pi=Math.floor(cx),pj=Math.floor(cy);if(pi>=0&&pi<G&&pj>=0&&pj<G)f[pj][pi]=1;}return;}const rMin=new Int32Array(G).fill(G),rMax=new Int32Array(G).fill(-1);function span(row,lo,hi){if(row<0||row>=G||lo>hi)return;const l=Math.max(0,lo),r=Math.min(G-1,hi);if(l>r)return;if(l<rMin[row])rMin[row]=l;if(r>rMax[row])rMax[row]=r;}let x=0,y=iR,d=1-iR;while(x<=y){if(isEven){span(cy-y,cx-x,cx+x-1);span(cy+y-1,cx-x,cx+x-1);span(cy-x-1,cx-y,cx+y-1);span(cy+x,cx-y,cx+y-1);}else{const gcx=Math.floor(cx),gcy=Math.floor(cy);span(gcy+y,gcx-x,gcx+x);span(gcy-y,gcx-x,gcx+x);span(gcy+x,gcx-y,gcx+y);span(gcy-x,gcx-y,gcx+y);}if(d<0)d+=2*x+3;else{d+=2*(x-y)+5;y--;}x++;}for(let j=0;j<G;j++)for(let i=rMin[j];i<=rMax[j];i++)if(i>=0&&i<G)f[j][i]=1;}
-function fillThreshold(G,cx,cy,R,f){const R2=R*R;const lo=Math.max(0,Math.floor(cx-R-1)),hi=Math.min(G-1,Math.ceil(cx+R+1));const lt=Math.max(0,Math.floor(cy-R-1)),ht=Math.min(G-1,Math.ceil(cy+R+1));for(let j=lt;j<=ht;j++)for(let i=lo;i<=hi;i++){const nx=Math.max(i,Math.min(i+1,cx)),ny=Math.max(j,Math.min(j+1,cy));if((nx-cx)**2+(ny-cy)**2<=R2)f[j][i]=1;}}
-function computeFilled(G,cx,cy,R){const f=Array.from({length:G},()=>new Uint8Array(G));if(algo==='euclidean')fillEuclidean(G,cx,cy,R,f);else if(algo==='bresenham')fillBresenham(G,cx,cy,R,f);else fillThreshold(G,cx,cy,R,f);return f;}
-function applyRenderMode(f,G){if(renderMode==='filled')return f;const b=Array.from({length:G},()=>new Uint8Array(G));for(let j=0;j<G;j++)for(let i=0;i<G;i++){if(!f[j][i])continue;if(j===0||!f[j-1][i]||j===G-1||!f[j+1][i]||i===0||!f[j][i-1]||i===G-1||!f[j][i+1])b[j][i]=1;}if(renderMode==='thin')return b;const t=Array.from({length:G},()=>new Uint8Array(G));for(let j=0;j<G;j++)for(let i=0;i<G;i++){if(!f[j][i])continue;if(b[j][i]){t[j][i]=1;continue;}const hH=(i>0&&b[j][i-1])||(i<G-1&&b[j][i+1]),hV=(j>0&&b[j-1][i])||(j<G-1&&b[j+1][i]);if(hH&&hV)t[j][i]=1;}return t;}
+  const trackW=r.width-T;
+  const cx_t=T/2+(val/max)*trackW, cy_t=r.height/2;
 
-/* ══ DRAW ════════════════════════════ */
-function snap(v){return Math.floor(v)+0.5;}
-function drawExtendedGrid(tc,ps,ox,oy,cW,cH,lw){tc.save();tc.strokeStyle=C().gridLine;tc.lineWidth=lw||1;tc.beginPath();const sx=ox-Math.ceil(ox/ps)*ps,sy=oy-Math.ceil(oy/ps)*ps;for(let x=sx;x<=cW+ps;x+=ps){const v=snap(x);tc.moveTo(v,0);tc.lineTo(v,cH);}for(let y=sy;y<=cH+ps;y+=ps){const v=snap(y);tc.moveTo(0,v);tc.lineTo(cW,v);}tc.stroke();tc.restore();}
-function drawPerfectCircle(tc,cx,cy,R,ps,ox,oy){const scrCX=ox+cx*ps,scrCY=oy+cy*ps,scrR=R*ps;if(scrR<1)return;const steps=Math.ceil(2*Math.PI*scrR*8);const seen=new Set();tc.fillStyle=C().circleArc;for(let s=0;s<steps;s++){const a=(s/steps)*Math.PI*2;const sx=Math.floor(scrCX+Math.cos(a)*scrR),sy=Math.floor(scrCY+Math.sin(a)*scrR);const k=sx*65536+sy;if(!seen.has(k)){seen.add(k);tc.fillRect(sx,sy,1,1);}}}
-function drawCenterLines(tc,cx,cy,ps,ox,oy,cW,cH){if(!showCenter||sliderActive)return;const isEven=(cx===Math.floor(cx));tc.save();tc.fillStyle=C().centerLine;if(isEven){const c1x=Math.floor(ox+(Math.floor(cx)-1)*ps),c2x=Math.floor(ox+Math.floor(cx)*ps),pw=Math.ceil(ps);const r1y=Math.floor(oy+(Math.floor(cy)-1)*ps),r2y=Math.floor(oy+Math.floor(cy)*ps),ph=Math.ceil(ps);tc.fillRect(c1x,0,pw,cH);tc.fillRect(c2x,0,pw,cH);const c1E=c1x+pw,c2E=c2x+pw;for(const ry of[r1y,r2y]){tc.fillRect(0,ry,c1x,ph);tc.fillRect(c1E,ry,c2x-c1E,ph);tc.fillRect(c2E,ry,cW-c2E,ph);}}else{const cpx=Math.floor(ox+Math.floor(cx)*ps),cpy=Math.floor(oy+Math.floor(cy)*ps),pw=Math.ceil(ps),ph=Math.ceil(ps);tc.fillRect(cpx,0,pw,cH);tc.fillRect(0,cpy,cpx,ph);tc.fillRect(cpx+pw,cpy,cW-(cpx+pw),ph);}tc.restore();}
-function renderViewport(tc,ox,oy,ps,G,cx,cy,R,f,cW,cH,doGrid,doCircle,doCenter){tc.imageSmoothingEnabled=false;tc.fillStyle=C().bg;tc.fillRect(0,0,cW,cH);tc.fillStyle=C().gridBg;tc.fillRect(0,0,cW,cH);tc.fillStyle=C().pixel;for(let j=0;j<G;j++)for(let i=0;i<G;i++)if(f[j][i])tc.fillRect(Math.floor(ox+i*ps),Math.floor(oy+j*ps),Math.ceil(ps),Math.ceil(ps));if(doGrid)drawExtendedGrid(tc,ps,ox,oy,cW,cH,1);if(doCircle)drawPerfectCircle(tc,cx,cy,R,ps,ox,oy);if(doCenter)drawCenterLines(tc,cx,cy,ps,ox,oy,cW,cH);}
-function getPad(D,ls){return ls?Math.max(2,Math.ceil(D*.10)):Math.max(3,Math.ceil(D*.15));}
+  // Compute font sizes
+  let fsSym=Math.round(T*.42), fsNum=Math.round(T*.38), fsRad=Math.round(T*.19);
+  const numStr=String(val);
+  const maxW=T*.82; // safe text width inside circle
 
-function drawThumb(){const wrap=document.getElementById('diam-slider-wrap');const r=wrap.getBoundingClientRect();if(!r.width)return;const T=getThumbPx(),dpr=window.devicePixelRatio||1;thumbCv.width=Math.round(r.width*dpr);thumbCv.height=Math.round(r.height*dpr);thumbCv.style.width=r.width+'px';thumbCv.style.height=r.height+'px';thumbCtx.setTransform(dpr,0,0,dpr,0,0);thumbCtx.clearRect(0,0,r.width,r.height);const trackW=r.width-T,cx_t=T/2+(diameter/32)*trackW,cy_t=r.height/2;const fsSym=Math.round(T*0.47),fsNum=Math.round(T*0.42),fsRad=Math.round(T*0.19);const numStr=String(diameter);thumbCtx.textBaseline='alphabetic';thumbCtx.font=`700 ${fsSym}px sans-serif`;const symW=thumbCtx.measureText('⌀').width;thumbCtx.font=`700 ${fsNum}px "JetBrains Mono",monospace`;const numW=thumbCtx.measureText(numStr).width;const sx=cx_t-(symW+1+numW)/2,y1=cy_t-(fsSym*0.72+4+fsRad*0.72)/2+fsSym*0.72;thumbCtx.fillStyle='#ffffff';thumbCtx.font=`700 ${fsSym}px sans-serif`;thumbCtx.fillText('⌀',sx,y1);thumbCtx.font=`700 ${fsNum}px "JetBrains Mono",monospace`;thumbCtx.fillText(numStr,sx+symW+1,y1);thumbCtx.font=`700 ${fsRad}px "JetBrains Mono",monospace`;thumbCtx.fillStyle='rgba(255,255,255,0.65)';thumbCtx.textAlign='center';thumbCtx.textBaseline='middle';thumbCtx.fillText(`r${radius}`,cx_t,y1+4+fsRad*0.5);}
+  // Scale down if text overflows circle
+  for(let tries=0;tries<8;tries++){
+    tc.font=`700 ${fsSym}px sans-serif`;
+    const symW2=tc.measureText('⌀').width;
+    tc.font=`700 ${fsNum}px "JetBrains Mono",monospace`;
+    const numW2=tc.measureText(numStr).width;
+    if(symW2+1+numW2<=maxW) break;
+    fsSym=Math.round(fsSym*.85); fsNum=Math.round(fsNum*.85);
+    if(fsSym<5) break;
+  }
 
-function draw(){
-  applyLayout(); /* item 3: decide layout before sizing */
-  const{w:cW,h:cH}=getCanvasSize();
-  mainCanvas.width=cW;mainCanvas.height=cH;
-  ctx.imageSmoothingEnabled=false;
-  if(!isLS){cFrame.style.width=cW+'px';cFrame.style.height=cH+'px';}
-  syncWidths(cW);fitTitle(cW);
-  updateInfo();drawThumb();syncOverlay(sliderActive);
-  const D=diameter,R=radius;
-  if(!D){ctx.fillStyle=C().bg;ctx.fillRect(0,0,cW,cH);return;}
-  const pad=getPad(D,isLS);const G=D+pad*2,cx=G/2,cy=G/2;
-  const fRaw=computeFilled(G,cx,cy,R);const f=applyRenderMode(fRaw,G);
-  const ps=Math.min(cW,cH)/G;const ox=(cW-G*ps)/2,oy=(cH-G*ps)/2;
-  if(showZoom){const m=1.0;const srcSpan=Math.max((cx+m)-(pad-m),(cy+m)-(pad-m));const zps=Math.min(cW,cH)/srcSpan;renderViewport(ctx,-(pad-m)*zps,-(pad-m)*zps,zps,G,cx,cy,R,f,cW,cH,showGrid,showCircle,showCenter);}
-  else{renderViewport(ctx,ox,oy,ps,G,cx,cy,R,f,cW,cH,showGrid,showCircle,showCenter);}
+  tc.font=`700 ${fsSym}px sans-serif`; const symW=tc.measureText('⌀').width;
+  tc.font=`700 ${fsNum}px "JetBrains Mono",monospace`; const numW=tc.measureText(numStr).width;
+
+  const sx=cx_t-(symW+1+numW)/2;
+  const subH=subLabel?fsRad*0.7:0;
+  const totalTextH=fsSym*0.7+(subH>0?4+subH:0);
+  const y1=cy_t-totalTextH/2+fsSym*0.7;
+
+  tc.fillStyle='#ffffff';
+  tc.font=`700 ${fsSym}px sans-serif`; tc.fillText('⌀',sx,y1);
+  tc.font=`700 ${fsNum}px "JetBrains Mono",monospace`; tc.fillText(numStr,sx+symW+1,y1);
+  if(subLabel){
+    tc.font=`700 ${fsRad}px "JetBrains Mono",monospace`;
+    tc.fillStyle='rgba(255,255,255,.65)'; tc.textAlign='center'; tc.textBaseline='middle';
+    tc.fillText(subLabel,cx_t,y1+4+fsRad*.5);
+  }
 }
 
-function downloadPNG(){const size=4000;const off=document.createElement('canvas');off.width=off.height=size;const otx=off.getContext('2d');otx.imageSmoothingEnabled=false;const D=diameter;if(!D)return;const pad=getPad(D,false);const G=D+pad*2,cx=G/2,cy=G/2;const fRaw=computeFilled(G,cx,cy,radius);const f=applyRenderMode(fRaw,G);const ps=size/G;otx.fillStyle=C().bg;otx.fillRect(0,0,size,size);otx.fillStyle=C().gridBg;otx.fillRect(0,0,size,size);otx.fillStyle=C().pixel;for(let j=0;j<G;j++)for(let i=0;i<G;i++)if(f[j][i])otx.fillRect(Math.floor(i*ps),Math.floor(j*ps),Math.ceil(ps),Math.ceil(ps));if(showGrid)drawExtendedGrid(otx,ps,0,0,size,size,5);if(showCircle)drawPerfectCircle(otx,cx,cy,radius,ps,0,0);if(showCenter)drawCenterLines(otx,cx,cy,ps,0,0,size,size);const a=document.createElement('a');a.download=`pixel-circle-d${D}-${renderMode}-${algo}.png`;a.href=off.toDataURL('image/png');a.click();}
+function drawAllThumbs(){
+  if(!isEllipse){
+    drawThumb(slSize,tcSize,boxSize,diamSize,32,`r${diamSize/2}`);
+  } else {
+    drawThumb(slWidth,tcWidth,boxWidth,diamW,32,null);
+    drawThumb(slHeight,tcHeight,boxHeight,diamH,32,null);
+  }
+}
 
-function onSliderChange(){diameter=parseInt(diamSl.value);radius=diameter/2;setTrack(diameter);draw();}
-diamSl.addEventListener('mousedown',()=>{sliderActive=true;draw();});
-diamSl.addEventListener('touchstart',()=>{sliderActive=true;draw();},{passive:true});
+function syncOverlay(v){
+  if(v){
+    if(isEllipse){ovSym.textContent='';ovNum.textContent=`${diamW}×${diamH}`;ovRad.textContent=`rx${diamW/2} ry${diamH/2}`;}
+    else{ovSym.textContent='⌀';ovNum.textContent=String(diamSize);ovRad.textContent=`r${diamSize/2}`;}
+  } else {ovSym.textContent='';ovNum.textContent='';ovRad.textContent='';}
+  diamOverlay.classList.toggle('visible',v);
+}
+
+/* ══ ALGORITHMS — generalised for ellipse (rx,ry) ══ */
+function fillEuclidean(Gc,Gr,cx,cy,rx,ry,f){
+  const rx2=rx*rx,ry2=ry*ry;
+  for(let j=0;j<Gr;j++){
+    const dy=j+.5-cy,dy2=dy*dy;
+    if(dy2/ry2>=1) continue;
+    const dxM=rx*Math.sqrt(1-dy2/ry2);
+    const lo=Math.max(0,Math.ceil(cx-dxM-.5)),hi=Math.min(Gc-1,Math.floor(cx+dxM-.5));
+    for(let i=lo;i<=hi;i++) f[j][i]=1;
+  }
+}
+function fillBresenham(Gc,Gr,cx,cy,rx,ry,f){
+  // Use midpoint ellipse scan-fill
+  const rxr=Math.round(rx),ryr=Math.round(ry);
+  const rMin=Array.from({length:Gr},()=>Gc);
+  const rMax=Array.from({length:Gr},()=>-1);
+  const addSpan=(row,lo,hi)=>{
+    const r=Math.floor(row);
+    if(r<0||r>=Gr) return;
+    const l=Math.max(0,Math.ceil(lo)),h=Math.min(Gc-1,Math.floor(hi));
+    if(l>h) return;
+    if(l<rMin[r])rMin[r]=l; if(h>rMax[r])rMax[r]=h;
+  };
+  const isEX=(cx===Math.floor(cx)),isEY=(cy===Math.floor(cy));
+  const plot=(dx,dy)=>{
+    // dx,dy are positive half-spans
+    const xl=cx-dx,xr=cx+dx-(isEX?1:0);
+    const rowA=cy-dy-(isEY?1:0), rowB=cy+dy-(isEY?1:0);
+    addSpan(rowA,xl,xr); addSpan(rowB,xl,xr);
+    if(!isEY&&dy===0) addSpan(cy,xl,xr);
+  };
+  let x=0,y=ryr;
+  let rx2=rxr*rxr,ry2=ryr*ryr;
+  let p=Math.round(ry2-(rx2*ryr)+(rx2/4));
+  while(2*ry2*x<2*rx2*y){
+    plot(x,y);
+    if(p<0){x++;p+=2*ry2*x+ry2;}else{x++;y--;p+=2*ry2*x-2*rx2*y+ry2;}
+  }
+  p=Math.round(rx2*((y-.5)*(y-.5))+ry2*((x+1)*(x+1))-rx2*ry2);
+  while(y>=0){
+    plot(x,y);
+    if(p>0){y--;p-=2*rx2*y+rx2;}else{y--;x++;p+=2*ry2*x-2*rx2*y+rx2;}
+  }
+  for(let j=0;j<Gr;j++) for(let i=rMin[j];i<=rMax[j];i++) if(i>=0&&i<Gc) f[j][i]=1;
+}
+function fillThreshold(Gc,Gr,cx,cy,rx,ry,f){
+  const rx2=rx*rx,ry2=ry*ry;
+  for(let j=0;j<Gr;j++) for(let i=0;i<Gc;i++){
+    const nx=Math.max(i,Math.min(i+1,cx)),ny=Math.max(j,Math.min(j+1,cy));
+    if((nx-cx)**2/rx2+(ny-cy)**2/ry2<=1) f[j][i]=1;
+  }
+}
+function computeFilled(Gc,Gr,cx,cy,rx,ry){
+  const f=Array.from({length:Gr},()=>new Uint8Array(Gc));
+  if(algo==='euclidean') fillEuclidean(Gc,Gr,cx,cy,rx,ry,f);
+  else if(algo==='bresenham') fillBresenham(Gc,Gr,cx,cy,rx,ry,f);
+  else fillThreshold(Gc,Gr,cx,cy,rx,ry,f);
+  return f;
+}
+function applyRenderMode(f,Gc,Gr){
+  if(renderMode==='filled') return f;
+  const b=Array.from({length:Gr},()=>new Uint8Array(Gc));
+  for(let j=0;j<Gr;j++) for(let i=0;i<Gc;i++){
+    if(!f[j][i]) continue;
+    if(j===0||!f[j-1][i]||j===Gr-1||!f[j+1][i]||i===0||!f[j][i-1]||i===Gc-1||!f[j][i+1]) b[j][i]=1;
+  }
+  if(renderMode==='thin') return b;
+  const t=Array.from({length:Gr},()=>new Uint8Array(Gc));
+  for(let j=0;j<Gr;j++) for(let i=0;i<Gc;i++){
+    if(!f[j][i]) continue;
+    if(b[j][i]){t[j][i]=1;continue;}
+    const hH=(i>0&&b[j][i-1])||(i<Gc-1&&b[j][i+1]),hV=(j>0&&b[j-1][i])||(j<Gr-1&&b[j+1][i]);
+    if(hH&&hV) t[j][i]=1;
+  }
+  return t;
+}
+
+/* ══ DRAW HELPERS ══ */
+function snap(v){return Math.floor(v)+.5;}
+
+/*
+  Extended grid: uses single ps for both directions → square cells.
+  sx/sy are start positions (may be negative if ox/oy>0).
+*/
+function drawExtendedGrid(tc,ps,ox,oy,cW,cH,lw){
+  tc.save();tc.strokeStyle=C().gridLine;tc.lineWidth=lw||1;tc.beginPath();
+  const sx=ox%ps-ps, sy=oy%ps-ps;
+  for(let x=sx;x<=cW+ps;x+=ps){const v=snap(x);tc.moveTo(v,0);tc.lineTo(v,cH);}
+  for(let y=sy;y<=cH+ps;y+=ps){const v=snap(y);tc.moveTo(0,v);tc.lineTo(cW,v);}
+  tc.stroke();tc.restore();
+}
+
+function drawPerfectEllipse(tc,cx,cy,rx,ry,ps,ox,oy){
+  const scrCX=ox+cx*ps,scrCY=oy+cy*ps,srX=rx*ps,srY=ry*ps;
+  if(srX<1||srY<1) return;
+  const steps=Math.ceil(2*Math.PI*Math.max(srX,srY)*8);
+  const seen=new Set(); tc.fillStyle=C().circleArc;
+  for(let s=0;s<steps;s++){
+    const a=(s/steps)*Math.PI*2;
+    const sx=Math.floor(scrCX+Math.cos(a)*srX),sy=Math.floor(scrCY+Math.sin(a)*srY);
+    const k=sx*65536+sy;
+    if(!seen.has(k)){seen.add(k);tc.fillRect(sx,sy,1,1);}
+  }
+}
+
+function drawCenterLines(tc,cx,cy,ps,ox,oy,cW,cH){
+  if(!showCenter||sliderActive) return;
+  const isEX=(cx===Math.floor(cx)),isEY=(cy===Math.floor(cy));
+  tc.save(); tc.fillStyle=C().centerLine;
+  const pw=Math.ceil(ps),ph=Math.ceil(ps);
+  if(isEX){
+    const c1=Math.floor(ox+(Math.floor(cx)-1)*ps),c2=Math.floor(ox+Math.floor(cx)*ps);
+    tc.fillRect(c1,0,pw,cH); tc.fillRect(c2,0,pw,cH);
+    const rows=isEY
+      ?[Math.floor(oy+(Math.floor(cy)-1)*ps),Math.floor(oy+Math.floor(cy)*ps)]
+      :[Math.floor(oy+Math.floor(cy)*ps)];
+    rows.forEach(ry=>{tc.fillRect(0,ry,c1,ph);tc.fillRect(c1+pw,ry,c2-c1-pw,ph);tc.fillRect(c2+pw,ry,cW-c2-pw,ph);});
+  } else {
+    const cp=Math.floor(ox+Math.floor(cx)*ps);
+    tc.fillRect(cp,0,pw,cH);
+    const rows=isEY
+      ?[Math.floor(oy+(Math.floor(cy)-1)*ps),Math.floor(oy+Math.floor(cy)*ps)]
+      :[Math.floor(oy+Math.floor(cy)*ps)];
+    rows.forEach(ry=>{tc.fillRect(0,ry,cp,ph);tc.fillRect(cp+pw,ry,cW-cp-pw,ph);});
+  }
+  tc.restore();
+}
+
+function renderViewport(tc,geo,f,cW,cH,doGrid,doCircle,doCenter,lw){
+  const{ps,Gc,Gr,ox,oy}=geo;
+  tc.imageSmoothingEnabled=false;
+  // Background
+  tc.fillStyle=C().bg; tc.fillRect(0,0,cW,cH);
+  tc.fillStyle=C().gridBg; tc.fillRect(0,0,cW,cH);
+  // Pixels — use ps for both x and y (square cells)
+  tc.fillStyle=C().pixel;
+  for(let j=0;j<Gr;j++) for(let i=0;i<Gc;i++)
+    if(f[j][i]) tc.fillRect(Math.floor(ox+i*ps),Math.floor(oy+j*ps),Math.ceil(ps),Math.ceil(ps));
+  if(doGrid) drawExtendedGrid(tc,ps,ox,oy,cW,cH,lw||1);
+  const cx=Gc/2,cy=Gr/2;
+  const rx=isEllipse?diamW/2:diamSize/2;
+  const ry=isEllipse?diamH/2:diamSize/2;
+  if(doCircle) drawPerfectEllipse(tc,cx,cy,rx,ry,ps,ox,oy);
+  if(doCenter) drawCenterLines(tc,cx,cy,ps,ox,oy,cW,cH);
+}
+
+/* ── Main draw ── */
+function draw(){
+  applyLayout();
+  const avail=getAvailableSpace();
+  const geo=computeGeometry(avail.w,avail.h);
+  if(!geo){ctx.fillStyle=C().bg;ctx.fillRect(0,0,mainCanvas.width||1,mainCanvas.height||1);return;}
+
+  const{cW,cH,ps,Gc,Gr,ox,oy}=geo;
+  mainCanvas.width=cW; mainCanvas.height=cH;
+  ctx.imageSmoothingEnabled=false;
+
+  if(isLS){
+    // Landscape: frame is CSS flex:1 (auto-sized by grid). Canvas fills frame.
+    cFrame.style.width=''; cFrame.style.height='';
+    // We still need to tell JS canvas its pixel size = frame size
+    // Actually cW/cH ARE the frame dimensions from getAvailableSpace
+    // But canvas element needs to match - set it
+    // (mainCanvas.width/height already set above)
+  } else {
+    // Portrait: frame wraps canvas exactly
+    cFrame.style.width=cW+'px'; cFrame.style.height=cH+'px';
+  }
+
+  syncWidths(cW); fitTitle(cW); fitPillFonts();
+  updateInfo(cW); drawAllThumbs(); syncOverlay(sliderActive);
+
+  const cx=Gc/2,cy=Gr/2;
+  const rx=isEllipse?diamW/2:diamSize/2;
+  const ry=isEllipse?diamH/2:diamSize/2;
+  const fRaw=computeFilled(Gc,Gr,cx,cy,rx,ry);
+  const f=applyRenderMode(fRaw,Gc,Gr);
+
+  if(showZoom&&!isEllipse){
+    const m=1.0,pad=getPad(diamSize);
+    const srcSpan=Math.max((cx+m)-(pad-m),(cy+m)-(pad-m));
+    const zps=Math.min(cW,cH)/srcSpan;
+    const zGeo={ps:zps,Gc,Gr,ox:-(pad-m)*zps,oy:-(pad-m)*zps};
+    renderViewport(ctx,zGeo,f,cW,cH,showGrid,showCircle,showCenter);
+  } else {
+    renderViewport(ctx,geo,f,cW,cH,showGrid,showCircle,showCenter);
+  }
+}
+
+/* ── Download ── */
+function downloadPNG(){
+  const size=4000;
+  if(isEllipse){
+    const padX=getPad(diamW),padY=getPad(diamH);
+    const Gc=diamW+padX*2,Gr=diamH+padY*2;
+    const aspect=Gc/Gr;
+    const dlW=Math.round(aspect>=1?size:size*aspect);
+    const dlH=Math.round(aspect>=1?size/aspect:size);
+    const off=document.createElement('canvas'); off.width=dlW; off.height=dlH;
+    const otx=off.getContext('2d'); otx.imageSmoothingEnabled=false;
+    const ps=Math.min(dlW/Gc,dlH/Gr);
+    const geo={ps,Gc,Gr,ox:(dlW-Gc*ps)/2,oy:(dlH-Gr*ps)/2,cW:dlW,cH:dlH};
+    const fRaw=computeFilled(Gc,Gr,Gc/2,Gr/2,diamW/2,diamH/2);
+    const f=applyRenderMode(fRaw,Gc,Gr);
+    renderViewport(otx,geo,f,dlW,dlH,showGrid,showCircle,showCenter,5);
+    const a=document.createElement('a');
+    a.download=`pixel-ellipse-${diamW}x${diamH}-${renderMode}-${algo}.png`;
+    a.href=off.toDataURL('image/png'); a.click();
+  } else {
+    const D=diamSize; if(!D) return;
+    const pad=getPad(D),G=D+pad*2;
+    const off=document.createElement('canvas'); off.width=off.height=size;
+    const otx=off.getContext('2d'); otx.imageSmoothingEnabled=false;
+    const ps=size/G;
+    const geo={ps,Gc:G,Gr:G,ox:0,oy:0,cW:size,cH:size};
+    const fRaw=computeFilled(G,G,G/2,G/2,D/2,D/2);
+    const f=applyRenderMode(fRaw,G,G);
+    renderViewport(otx,geo,f,size,size,showGrid,showCircle,showCenter,5);
+    const a=document.createElement('a');
+    a.download=`pixel-circle-d${D}-${renderMode}-${algo}.png`;
+    a.href=off.toDataURL('image/png'); a.click();
+  }
+}
+
+/* ── Events ── */
+function mkSl(sl,setter){
+  sl.addEventListener('mousedown',()=>{sliderActive=true;draw();});
+  sl.addEventListener('touchstart',()=>{sliderActive=true;draw();},{passive:true});
+  sl.addEventListener('input',()=>{setter(parseInt(sl.value));draw();});
+}
 window.addEventListener('mouseup',()=>{if(sliderActive){sliderActive=false;draw();}});
 window.addEventListener('touchend',()=>{if(sliderActive){sliderActive=false;draw();}});
-diamSl.addEventListener('input',onSliderChange);
+mkSl(slSize,v=>{diamSize=v;setTrack(slSize,v,32);});
+mkSl(slWidth,v=>{diamW=v;setTrack(slWidth,v,32);});
+mkSl(slHeight,v=>{diamH=v;setTrack(slHeight,v,32);});
 document.querySelectorAll('.rnd-opt').forEach(o=>{o.addEventListener('click',()=>{renderMode=o.dataset.mode;document.querySelectorAll('.rnd-opt').forEach(x=>x.classList.remove('active'));o.classList.add('active');draw();});});
 document.querySelectorAll('.algo-opt').forEach(o=>{o.addEventListener('click',()=>{algo=o.dataset.algo;document.querySelectorAll('.algo-opt').forEach(x=>x.classList.remove('active'));o.classList.add('active');draw();});});
 btnCircle.addEventListener('click',()=>{showCircle=!showCircle;btnCircle.classList.toggle('active',showCircle);draw();});
@@ -456,9 +795,9 @@ btnGrid.addEventListener('click',()=>{showGrid=!showGrid;btnGrid.classList.toggl
 btnTheme.addEventListener('click',()=>{isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'light');draw();});
 btnDownload.addEventListener('click',downloadPNG);
 new ResizeObserver(()=>draw()).observe(cWrap);
-new ResizeObserver(()=>drawThumb()).observe(document.getElementById('diam-slider-wrap'));
+[document.getElementById('sw-size'),document.getElementById('sw-width'),document.getElementById('sw-height')].forEach(el=>{if(el)new ResizeObserver(()=>drawAllThumbs()).observe(el);});
 window.addEventListener('resize',()=>draw());
-setTrack(diameter);
+setTrack(slSize,diamSize,32); setTrack(slWidth,diamW,32); setTrack(slHeight,diamH,32);
 requestAnimationFrame(()=>requestAnimationFrame(draw));
 </script>
 </body>
