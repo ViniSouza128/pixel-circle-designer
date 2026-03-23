@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.vinisouza.pixelcircle",
+      "sha256_cert_fingerprints": [
+        "03:FA:31:8E:23:CF:EE:71:A4:D9:5B:74:0F:51:1B:8E:49:30:BF:CC:8D:F5:03:50:57:87:90:28:11:B1:DE:E5"
+      ]
+    }
+  }
+]
